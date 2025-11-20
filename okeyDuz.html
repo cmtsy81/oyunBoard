@@ -3,411 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Okey Skor Takibi</title>
+    <title>Okey Skor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; overscroll-behavior-y: contain; }
         .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+
         /* HEADER */
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; }
-        .header-center { text-align: center; }
-        .header h1 { font-size: 20px; margin-bottom: 2px; }
-        .header .status { font-size: 12px; opacity: 0.9; }
-        .btn-icon { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-icon:hover { background: rgba(255,255,255,0.2); }
-        /* CONTENT */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .header h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; margin: 0; }
+        .header .status { font-size: 12px; opacity: 0.9; font-weight: 600; }
+        .btn-icon { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; }
+
         .content { flex: 1; padding: 16px; overflow-y: auto; }
+
+        /* SETUP & TABLE LAYOUT */
         .setup-section { display: none; }
         .setup-section.active { display: block; }
-        .setup-group { margin-bottom: 16px; }
-        .setup-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
-        .setup-group input, .setup-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; }
-        .setup-buttons { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-start { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        
+        .table-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .pos-top { grid-column: 2; grid-row: 1; }
+        .pos-left { grid-column: 1; grid-row: 2; }
+        .pos-right { grid-column: 3; grid-row: 2; }
+        .pos-bottom { grid-column: 2; grid-row: 3; }
+        .pos-center { grid-column: 2; grid-row: 2; min-height: 100px; display: flex; align-items: center; justify-content: center; z-index: 5; }
+
+        .setup-input-wrapper { text-align: center; }
+        .setup-label { font-size: 11px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
+        .player-name-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; }
+        .setup-group { margin-bottom: 15px; }
+        .setup-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+        .setup-group select, .setup-group input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; }
+        .btn-start { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+
         /* SCOREBOARD */
         .scoreboard { display: none; }
         .scoreboard.active { display: block; }
-        .scores-display { display: grid; gap: 8px; margin-bottom: 16px; }
-        .score-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 8px; border-radius: 8px; text-align: center; }
-        .score-card.team2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .score-name { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
-        .score-value { font-size: 32px; font-weight: bold; }
-        /* CONTROLS */
-        .controls-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
-        .controls-label { font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; min-width: 80px; }
-        .button-group { display: grid; gap: 6px; flex: 1; }
-        .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-        .grid-2 { grid-template-columns: 1fr 1fr; }
-        .btn-toggle { padding: 10px 2px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #333; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        @media (max-width: 380px) { .btn-toggle { font-size: 10px; } }
-        .btn-toggle.selected { background: #667eea; color: white; border-color: #667eea; }
-        .btn-toggle.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
-        .confirm-btn { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
-        .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .player-card {
+            background: white; border: 2px solid #eee; border-radius: 12px; padding: 10px;
+            position: relative; transition: all 0.2s; text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 12px; cursor: pointer;
+        }
+        .player-card:active { transform: scale(0.95); background: #f0f2ff; border-color: #667eea; }
+        
+        /* Takım Modu Renkleri */
+        .team-a { border-left: 4px solid #667eea; } /* Biz */
+        .team-b { border-left: 4px solid #f093fb; } /* Rakip */
+
+        .p-name { font-weight: bold; color: #2c3e50; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .p-score { font-size: 24px; font-weight: 800; color: #667eea; }
+        
+        .center-info { 
+            text-align: center; color: #bdc3c7; font-size: 11px; font-weight: bold; line-height: 1.4; 
+            border: 2px dashed #eee; padding: 10px; border-radius: 50%; width: 100px; height: 100px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
         /* HISTORY */
-        .history-section { margin-bottom: 20px; }
-        .history-title { font-weight: 600; color: #333; margin-bottom: 12px; font-size: 14px; }
-        .history-list { display: flex; flex-direction: column; gap: 10px; }
-        .history-item { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item-text { color: #333; display: flex; align-items: center; gap: 5px; }
-        .history-num { color: #667eea; font-weight: bold; min-width: 40px; }
-        .history-item-buttons { display: flex; gap: 8px; }
-        .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; color: white;}
-        .btn-edit { background: #2196F3; }
-        .btn-delete { background: #f44336; }
-        /* GAME OVER */
-        .game-over { background: #fff3cd; padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px; display: none; }
-        .game-over.active { display: block; }
-        .game-over h2 { color: #856404; margin-bottom: 10px; font-size: 18px; }
+        .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .h-item { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea; margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; color: white; margin-left: 5px;}
+        .btn-edit { background: #2196F3; } .btn-del { background: #f44336; }
+
         /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 16px; }
-        .modal.active { display: flex; align-items: flex-end; }
-        .modal-content { background: white; border-radius: 12px 12px 0 0; padding: 20px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #333; }
-        .modal-group { margin-bottom: 16px; }
-        .modal-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
-        .modal-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-        .modal-btn { flex: 1; min-width: 70px; padding: 10px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
-        .modal-btn.selected { background: #667eea; color: white; border-color: #667eea; }
-        .modal-btn.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
-        .modal-footer { display: flex; gap: 10px; margin-top: 16px; }
-        .modal-save { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-        .modal-cancel { flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
+        .modal.active { display: flex; }
+        .modal-sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 80vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+        
+        .finish-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .f-btn { padding: 15px; border: 2px solid #eee; background: white; border-radius: 10px; font-weight: bold; color: #555; cursor: pointer; }
+        .f-btn.normal { border-color: #667eea; color: #667eea; }
+        .f-btn.okey { border-color: #d35400; color: #d35400; }
+        .f-btn.katlama { border-color: #e74c3c; color: #e74c3c; }
+
         /* DIALOG */
-        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease-out; }
+        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
         .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #333; }
-        .dialog-message { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.5; }
-        .dialog-actions { display: flex; gap: 10px; }
-        .dialog-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
-        .dialog-btn-cancel { background: #f0f0f0; color: #333; }
-        .dialog-btn-confirm { background: #667eea; color: white; }
-        .dialog-btn-danger { background: #f44336; color: white; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; background: #f9f9f9; border-top: 1px solid #eee; }
+        .dialog-box { background: white; padding: 20px; border-radius: 12px; width: 80%; max-width: 300px; text-align: center; }
+        .d-btn { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .d-confirm { background: #667eea; color: white; }
+        .d-cancel { background: #eee; color: #333; margin-right: 10px; }
+
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <button class="btn-icon" onclick="goHome()" title="Ana Menü">🏠</button>
-            <div class="header-center">
-                <h1>🃏 Okey</h1>
-                <div class="status" id="status">Oyun Kurulumu</div>
-            </div>
-            <button class="btn-icon" onclick="resetGame()" title="Oyunu Sıfırla">🔄</button>
+            <button class="btn-icon" onclick="goHome()">🏠</button>
+            <div class="header-center"><h1>Okey</h1><div class="status" id="status">Kurulum</div></div>
+            <button class="btn-icon" onclick="resetGame()">🔄</button>
         </div>
 
         <div class="content">
             <div class="setup-section active" id="setupSection">
                 <div class="setup-group">
-                    <label>Eşli mi oynamak istiyorsunuz?</label>
-                    <select id="teamMode">
-                        <option value="false">Hayır (4 oyuncu)</option>
-                        <option value="true">Evet (2 takım)</option>
+                    <label>Oyun Modu</label>
+                    <select id="teamMode" onchange="toggleTeamInputs()">
+                        <option value="false">Bireysel (4 Kişi)</option>
+                        <option value="true">Eşli (2 Takım)</option>
                     </select>
                 </div>
+                
                 <div class="setup-group">
-                    <label>Hangi sayıdan düşülsün?</label>
-                    <input type="number" id="startNumber" value="20" min="1" max="100">
+                    <label>Başlangıç Sayısı</label>
+                    <input type="number" id="startNumber" value="20">
                 </div>
-                <div class="setup-buttons">
-                    <button class="btn-start" onclick="startGame()">Oyunu Başlat</button>
-                </div>
-            </div>
 
-            <div class="game-over" id="gameOver">
-                <h2 id="gameOverMessage"></h2>
+                <div class="table-layout">
+                    <div class="pos-top setup-input-wrapper">
+                        <label class="setup-label" id="lbl-top">Karşı</label>
+                        <input type="text" class="player-name-input" id="p2" value="Karşı">
+                    </div>
+                    <div class="pos-left setup-input-wrapper">
+                        <label class="setup-label" id="lbl-left">Sol</label>
+                        <input type="text" class="player-name-input" id="p3" value="Sol">
+                    </div>
+                    <div class="pos-center" style="opacity:0.3; font-weight:bold; font-size:12px;">MASA</div>
+                    <div class="pos-right setup-input-wrapper">
+                        <label class="setup-label" id="lbl-right">Sağ</label>
+                        <input type="text" class="player-name-input" id="p1" value="Sağ">
+                    </div>
+                    <div class="pos-bottom setup-input-wrapper">
+                        <label class="setup-label" id="lbl-bottom">Ben</label>
+                        <input type="text" class="player-name-input" id="p0" value="Ben">
+                    </div>
+                </div>
+                
+                <button class="btn-start" onclick="startGame()">Oyunu Başlat</button>
             </div>
 
             <div class="scoreboard" id="scoreboard">
-                <div class="scores-display" id="scoresDisplay"></div>
-                <div class="controls-row">
-                    <div class="controls-label">Kim bitti?</div>
-                    <div class="button-group" id="winnerSelect"></div>
-                </div>
-                <div class="controls-row">
-                    <div class="controls-label">Nasıl bitti?</div>
-                    <div class="button-group grid-3">
-                        <button class="btn-toggle" onclick="selectFinish('normal', this)">Normal (2)</button>
-                        <button class="btn-toggle" onclick="selectFinish('okey', this)">Okey (4)</button>
-                        <button class="btn-toggle" onclick="selectFinish('double', this)">Katlamalı (8)</button>
+                <div class="table-layout" id="gameTable">
+                    <div class="pos-center">
+                        <div class="center-info">
+                            BİTEN OYUNCUNUN<br>KARTINA TIKLA
+                        </div>
                     </div>
                 </div>
-                <button class="confirm-btn" id="confirmBtn" onclick="submitRound()" disabled>El Kaydet</button>
-                <div class="history-section" id="historySection">
-                    <div class="history-title">El Geçmişi</div>
-                    <div class="history-list" id="historyList"></div>
+
+                <div class="history-area">
+                    <div style="font-size:12px; font-weight:bold; color:#95a5a6; margin-bottom:5px;">GEÇMİŞ ELLER</div>
+                    <div id="historyList"></div>
                 </div>
             </div>
         </div>
-        <div class="footer-version" id="footerVersion">v1.0.0</div>
+        <div class="footer-version" id="footerVersion">v1.2.0</div>
+    </div>
+
+    <div class="modal" id="finishModal">
+        <div class="modal-sheet">
+            <div style="text-align:center; margin-bottom:10px; font-weight:bold; font-size:16px;">
+                <span id="modalPlayerName" style="color:#667eea;"></span> Bitti
+            </div>
+            <div style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Nasıl bittiğini seçin:</div>
+            
+            <div class="finish-options">
+                <button class="f-btn normal" onclick="submitRound('normal')">Normal<br>(2)</button>
+                <button class="f-btn okey" onclick="submitRound('okey')">Okey<br>(4)</button>
+                <button class="f-btn katlama" onclick="submitRound('double')">Katlama<br>(8)</button>
+            </div>
+            <button onclick="document.getElementById('finishModal').classList.remove('active')" style="width:100%; padding:12px; margin-top:15px; border:none; background:#eee; border-radius:8px;">Vazgeç</button>
+        </div>
     </div>
 
     <div class="modal" id="editModal">
-        <div class="modal-content">
-            <div class="modal-header">El Düzenle</div>
-            <div class="modal-group"><div class="modal-label">Kimin bitti?</div><div class="modal-buttons" id="editWinnerSelect"></div></div>
-            <div class="modal-group"><div class="modal-label">Nasıl bitti?</div><div class="modal-buttons" id="editFinishSelect"></div></div>
-            <div class="modal-footer"><button class="modal-cancel" onclick="closeEditModal()">İptal</button><button class="modal-save" onclick="saveEditRound()">Kaydet</button></div>
+        <div class="modal-sheet">
+            <div style="text-align:center; margin-bottom:10px; font-weight:bold;">Eli Düzenle</div>
+            <div style="margin-bottom:10px;">
+                <label style="font-size:12px; font-weight:bold;">Biten Kişi:</label>
+                <select id="editWinnerSelect" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"></select>
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="font-size:12px; font-weight:bold;">Bitiş Türü:</label>
+                <div class="finish-options">
+                    <button class="f-btn normal" onclick="updateEditFinish('normal')" id="edit-btn-normal">N (2)</button>
+                    <button class="f-btn okey" onclick="updateEditFinish('okey')" id="edit-btn-okey">O (4)</button>
+                    <button class="f-btn katlama" onclick="updateEditFinish('double')" id="edit-btn-double">K (8)</button>
+                </div>
+            </div>
+            <button onclick="saveEditRound()" style="width:100%; padding:12px; background:#667eea; color:white; border:none; border-radius:8px;">Kaydet</button>
+            <button onclick="document.getElementById('editModal').classList.remove('active')" style="width:100%; padding:12px; margin-top:10px; border:none; background:#eee; border-radius:8px;">İptal</button>
         </div>
     </div>
+
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <div class="dialog-title" id="dialogTitle"></div>
-            <div class="dialog-message" id="dialogMessage"></div>
-            <div class="dialog-actions" id="dialogActions"></div>
+            <h3 id="dTitle" style="margin:0 0 10px 0;"></h3>
+            <p id="dMsg" style="color:#666; font-size:14px;"></p>
+            <div id="dActions" style="display:flex; gap:10px; margin-top:15px;"></div>
         </div>
     </div>
 
     <script>
-        const APP_VERSION = '1.0.0'; 
+        const APP_VERSION = '1.2.0';
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
-        // --- SES EFEKTLERİ ---
+        const POSITIONS = ['pos-bottom', 'pos-right', 'pos-top', 'pos-left'];
+        
+        let gameState = {
+            version: APP_VERSION,
+            teamMode: false,
+            startNumber: 20,
+            scores: [],
+            playerNames: [],
+            gameActive: false,
+            history: []
+        };
+
+        let tempWinnerIndex = null; // Modalda seçilen kişi
+        let editState = { index: null, finish: 'normal' }; // Düzenleme için
+
+        window.onload = loadState;
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playClick() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
-        }
-        // Tüm butonlara ses dinleyicisi ekle (Event Delegation)
-        document.addEventListener('click', function(e) {
-            if(e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                playClick();
+
+        document.addEventListener('click', e => {
+            if(e.target.closest('button') || e.target.closest('.player-card')) {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
             }
         });
-        // --------------------
 
-        let gameState = { version: APP_VERSION, teamMode: false, startNumber: 20, scores: [], playerNames: [], selectedWinner: null, selectedFinish: null, gameActive: false, history: [] };
-        let editingRoundIndex = null;
-
-        window.onload = function() { loadState(); }
-
-        function saveState() { gameState.version = APP_VERSION; localStorage.setItem('okeyGameState', JSON.stringify(gameState)); }
-        function loadState() {
-            const saved = localStorage.getItem('okeyGameState');
-            if (saved) {
-                try {
-                    const loadedState = JSON.parse(saved);
-                    if (loadedState.version !== APP_VERSION) { localStorage.removeItem('okeyGameState'); return; }
-                    gameState = loadedState;
-                    if (gameState.gameActive) {
-                        document.getElementById('setupSection').classList.remove('active');
-                        document.getElementById('scoreboard').classList.add('active');
-                        document.getElementById('gameOver').classList.remove('active');
-                        const gridClass = gameState.teamMode ? 'grid-2' : 'grid-4';
-                        document.getElementById('scoresDisplay').className = 'scores-display ' + gridClass;
-                        document.getElementById('winnerSelect').className = 'button-group ' + gridClass;
-                        renderScoreboard();
-                        updateStatus();
-                    }
-                } catch (e) { localStorage.removeItem('okeyGameState'); }
+        function toggleTeamInputs() {
+            const isTeam = document.getElementById('teamMode').value === 'true';
+            if (isTeam) {
+                document.getElementById('p0').value = "Biz"; document.getElementById('p0').disabled = true;
+                document.getElementById('p2').value = "Biz"; document.getElementById('p2').disabled = true;
+                document.getElementById('p1').value = "Rakip"; document.getElementById('p1').disabled = true;
+                document.getElementById('p3').value = "Rakip"; document.getElementById('p3').disabled = true;
+            } else {
+                document.getElementById('p0').value = "Ben"; document.getElementById('p0').disabled = false;
+                document.getElementById('p2').value = "Karşı"; document.getElementById('p2').disabled = false;
+                document.getElementById('p1').value = "Sağ"; document.getElementById('p1').disabled = false;
+                document.getElementById('p3').value = "Sol"; document.getElementById('p3').disabled = false;
             }
         }
 
         function startGame() {
             const teamMode = document.getElementById('teamMode').value === 'true';
-            const startNumber = parseInt(document.getElementById('startNumber').value);
-            if (startNumber < 1) { showDialog('Hata', 'Lütfen geçerli bir sayı girin', null, 'normal'); return; }
+            const startVal = document.getElementById('startNumber').value;
+            if (!startVal || startVal < 1) { alert("Geçerli sayı girin"); return; }
+
             gameState.teamMode = teamMode;
-            gameState.startNumber = startNumber;
-            gameState.playerNames = teamMode ? ['Biz', 'Rakip'] : ['Ben', 'Sol', 'Karşı', 'Sağ'];
-            gameState.scores = Array(teamMode ? 2 : 4).fill(startNumber);
-            gameState.selectedWinner = null;
-            gameState.selectedFinish = null;
-            gameState.gameActive = true;
+            gameState.startNumber = parseInt(startVal);
+            
+            // İsimleri al
+            if (teamMode) {
+                gameState.playerNames = ['Biz', 'Rakip', 'Biz', 'Rakip']; // 4 kişi ama isimler takım
+                // Skorlar takım bazlı (2 eleman) ama masa 4 kişi.
+                // Basitlik için: Eşli modda skorlar [Biz, Rakip] olarak 2 elemanlı tutulur.
+                // Masa gösteriminde p0 ve p2 -> skor[0], p1 ve p3 -> skor[1] gösteririz.
+                gameState.scores = [gameState.startNumber, gameState.startNumber];
+            } else {
+                gameState.playerNames = [
+                    document.getElementById('p0').value,
+                    document.getElementById('p1').value,
+                    document.getElementById('p2').value,
+                    document.getElementById('p3').value
+                ];
+                gameState.scores = Array(4).fill(gameState.startNumber);
+            }
+            
             gameState.history = [];
+            gameState.gameActive = true;
             gameState.version = APP_VERSION;
-            const gridClass = teamMode ? 'grid-2' : 'grid-4';
-            document.getElementById('scoresDisplay').className = 'scores-display ' + gridClass;
-            document.getElementById('winnerSelect').className = 'button-group ' + gridClass;
-            document.getElementById('setupSection').classList.remove('active');
-            document.getElementById('scoreboard').classList.add('active');
-            document.getElementById('gameOver').classList.remove('active');
-            renderScoreboard();
-            updateStatus();
+
+            updateUI();
             saveState();
         }
 
-        function renderScoreboard() {
-            const display = document.getElementById('scoresDisplay');
-            display.innerHTML = '';
-            gameState.scores.forEach((score, index) => {
-                const card = document.createElement('div');
-                card.className = `score-card ${gameState.teamMode && index === 1 ? 'team2' : ''}`;
-                card.innerHTML = `<div class="score-name">${gameState.playerNames[index]}</div><div class="score-value">${score}</div>`;
-                display.appendChild(card);
+        function onPlayerClick(index) {
+            tempWinnerIndex = index;
+            // Eşli modda tıklanan kişinin takım ismi görünsün
+            const name = gameState.playerNames[index];
+            document.getElementById('modalPlayerName').textContent = name;
+            document.getElementById('finishModal').classList.add('active');
+        }
+
+        function submitRound(type) {
+            document.getElementById('finishModal').classList.remove('active');
+            
+            const points = { 'normal': 2, 'okey': 4, 'double': 8 }[type];
+            let winner = tempWinnerIndex;
+
+            // Eşli modda winner index 0-1 (Biz-Rakip) olmalı
+            if(gameState.teamMode) {
+                // Masa: 0(Biz), 1(Rakip), 2(Biz), 3(Rakip)
+                // Skor Index: 0(Biz), 1(Rakip)
+                winner = (tempWinnerIndex % 2); 
+            }
+
+            // Skor düş
+            if(gameState.teamMode) {
+                // Kazanan hariç diğer takımdan düş
+                const loserTeam = (winner === 0) ? 1 : 0;
+                gameState.scores[loserTeam] -= points;
+            } else {
+                // Bireysel: Kazanan hariç herkesten düş
+                for(let i=0; i<4; i++) {
+                    if(i !== winner) gameState.scores[i] -= points;
+                }
+            }
+
+            gameState.history.push({
+                winnerMask: tempWinnerIndex, // Masada kim tıklandı (0-3)
+                finish: type,
+                points: points
             });
-            renderWinnerSelect();
-            renderHistory();
-        }
-
-        function renderWinnerSelect() {
-            const select = document.getElementById('winnerSelect');
-            select.innerHTML = '';
-            gameState.scores.forEach((score, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-toggle';
-                btn.textContent = gameState.playerNames[index];
-                btn.onclick = () => selectWinner(index, btn);
-                if (gameState.selectedWinner === index) btn.classList.add('selected');
-                select.appendChild(btn);
-            });
-        }
-
-        function selectWinner(index, btn) {
-            gameState.selectedWinner = index;
-            document.querySelectorAll('#winnerSelect .btn-toggle').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            updateConfirmBtn();
-        }
-
-        function selectFinish(type, btn) {
-            gameState.selectedFinish = type;
-            btn.parentElement.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('finish-selected'));
-            btn.classList.add('finish-selected');
-            updateConfirmBtn();
-        }
-
-        function updateConfirmBtn() {
-            const btn = document.getElementById('confirmBtn');
-            btn.disabled = gameState.selectedWinner === null || gameState.selectedFinish === null;
-        }
-
-        function submitRound() {
-            if (gameState.selectedWinner === null || gameState.selectedFinish === null) return;
-            const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
-            const points = pointMap[gameState.selectedFinish];
-            const winner = gameState.selectedWinner;
-            gameState.history.push({ winner: winner, finish: gameState.selectedFinish, points: points });
-            for (let i = 0; i < gameState.scores.length; i++) { if (i !== winner) gameState.scores[i] -= points; }
-            gameState.selectedWinner = null;
-            gameState.selectedFinish = null;
-            document.querySelectorAll('#winnerSelect .btn-toggle').forEach(b => b.classList.remove('selected'));
-            document.querySelectorAll('.button-group .btn-toggle').forEach(b => b.classList.remove('finish-selected'));
-            const loserIndex = gameState.scores.findIndex(s => s <= 0);
-            if (loserIndex !== -1) { gameState.gameActive = false; endGame(loserIndex); } else { renderScoreboard(); updateConfirmBtn(); updateStatus(); }
+            
+            checkForEnd();
+            updateUI();
             saveState();
         }
 
-        function renderHistory() {
-            const list = document.getElementById('historyList');
-            list.innerHTML = '';
-            if (gameState.history.length === 0) { list.innerHTML = '<div style="color: #999; font-size: 13px;">Henüz el kaydı yok</div>'; return; }
-            [...gameState.history].reverse().forEach((round, reverseIndex) => {
-                const realIndex = gameState.history.length - 1 - reverseIndex;
-                const handNumber = realIndex + 1;
-                const finishText = { 'normal': 'Normal (2)', 'okey': 'Okey (4)', 'double': 'Katlamalı (8)' };
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <div class="history-item-text"><span class="history-num">${handNumber}. El:</span><span><strong>${gameState.playerNames[round.winner]}</strong> - ${finishText[round.finish]}</span></div>
-                    <div class="history-item-buttons"><button class="btn-small btn-edit" onclick="openEditModal(${realIndex})">Düzenle</button><button class="btn-small btn-delete" onclick="deleteRound(${realIndex})">Sil</button></div>
-                `;
-                list.appendChild(item);
-            });
+        function checkForEnd() {
+            let loserExists = false;
+            gameState.scores.forEach(s => { if(s <= 0) loserExists = true; });
+            
+            if(loserExists) {
+                showDialog("Oyun Bitti!", "Skor sıfırlandı. Yeni oyun?", (yes)=>{
+                    if(yes) { localStorage.removeItem('okeyGameStatev12'); window.location.reload(); }
+                }, "confirm");
+            }
         }
 
-        function deleteRound(idx) {
-            showDialog('Eli Sil', 'Bu eli silmek istediğinize emin misiniz? Puanlar geri alınacak.', () => {
-                const round = gameState.history[idx];
-                const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
-                for (let i = 0; i < gameState.scores.length; i++) { if (i !== round.winner) gameState.scores[i] += pointMap[round.finish]; }
-                gameState.history.splice(idx, 1);
-                renderScoreboard(); updateStatus(); saveState();
-            }, 'danger');
-        }
-
-        function openEditModal(idx) {
-            editingRoundIndex = idx;
-            const round = gameState.history[idx];
-            const winnerSelect = document.getElementById('editWinnerSelect');
-            winnerSelect.innerHTML = '';
-            gameState.scores.forEach((score, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'modal-btn';
-                btn.textContent = gameState.playerNames[index];
-                btn.dataset.winner = index;
-                btn.onclick = () => { document.querySelectorAll('#editWinnerSelect .modal-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); };
-                if (round.winner === index) btn.classList.add('selected');
-                winnerSelect.appendChild(btn);
-            });
-            const finishSelect = document.getElementById('editFinishSelect');
-            finishSelect.innerHTML = '';
-            ['normal', 'okey', 'double'].forEach(type => {
-                const finishText = { 'normal': 'Normal (2)', 'okey': 'Okey (4)', 'double': 'Katlamalı (8)' };
-                const btn = document.createElement('button');
-                btn.className = 'modal-btn';
-                btn.textContent = finishText[type];
-                btn.dataset.finish = type;
-                btn.onclick = () => { document.querySelectorAll('#editFinishSelect .modal-btn').forEach(b => b.classList.remove('finish-selected')); btn.classList.add('finish-selected'); };
-                if (round.finish === type) btn.classList.add('finish-selected');
-                finishSelect.appendChild(btn);
-            });
+        // --- EDIT ---
+        function openEditModal(historyIndex) {
+            editState.index = historyIndex;
+            const round = gameState.history[historyIndex];
+            editState.finish = round.finish;
+            
+            // Select options doldur
+            const sel = document.getElementById('editWinnerSelect');
+            sel.innerHTML = '';
+            
+            // Eşli modda sadece "Biz" ve "Rakip" seçenekleri mantıklı
+            if(gameState.teamMode) {
+                const opt1 = new Option("Biz", 0); sel.add(opt1);
+                const opt2 = new Option("Rakip", 1); sel.add(opt2);
+                sel.value = round.winnerMask % 2; 
+            } else {
+                gameState.playerNames.forEach((n, i) => {
+                    const opt = new Option(n, i);
+                    sel.add(opt);
+                });
+                sel.value = round.winnerMask;
+            }
+            
+            updateEditFinish(round.finish);
             document.getElementById('editModal').classList.add('active');
         }
 
-        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); editingRoundIndex = null; }
-        
-        function saveEditRound() {
-            const winnerBtn = document.querySelector('#editWinnerSelect .modal-btn.selected');
-            const finishBtn = document.querySelector('#editFinishSelect .modal-btn.finish-selected');
-            if (!winnerBtn || !finishBtn) return;
-            const newWinner = parseInt(winnerBtn.dataset.winner);
-            const newFinish = finishBtn.dataset.finish;
-            const oldRound = gameState.history[editingRoundIndex];
-            const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
-            for (let i = 0; i < gameState.scores.length; i++) { if (i !== oldRound.winner) gameState.scores[i] += pointMap[oldRound.finish]; }
-            const newPoints = pointMap[newFinish];
-            for (let i = 0; i < gameState.scores.length; i++) { if (i !== newWinner) gameState.scores[i] -= newPoints; }
-            gameState.history[editingRoundIndex] = { winner: newWinner, finish: newFinish, points: newPoints };
-            closeEditModal(); renderScoreboard(); updateStatus(); saveState();
+        function updateEditFinish(type) {
+            editState.finish = type;
+            document.querySelectorAll('.f-btn').forEach(b => b.style.opacity = "0.5");
+            const btnMap = { 'normal': 'edit-btn-normal', 'okey': 'edit-btn-okey', 'double': 'edit-btn-double' };
+            document.getElementById(btnMap[type]).style.opacity = "1";
+            document.getElementById(btnMap[type]).style.borderWidth = "3px";
         }
 
-        function endGame(loserIndex) {
-            const winnerName = gameState.teamMode ? (loserIndex === 0 ? 'Takım 2 (Rakip)' : 'Takım 1 (Biz)') : gameState.playerNames[loserIndex];
-            document.getElementById('gameOverMessage').textContent = `🎉 Oyun Bitti!\n${winnerName} kaybetti!`;
-            document.getElementById('gameOver').classList.add('active');
-            document.getElementById('scoreboard').classList.remove('active');
+        function saveEditRound() {
+            const hIdx = editState.index;
+            const oldRound = gameState.history[hIdx];
+            
+            // 1. Eski puanları geri ver
+            if(gameState.teamMode) {
+                const oldLoser = (oldRound.winnerMask % 2 === 0) ? 1 : 0;
+                gameState.scores[oldLoser] += oldRound.points;
+            } else {
+                for(let i=0; i<4; i++) {
+                    if(i !== oldRound.winnerMask) gameState.scores[i] += oldRound.points;
+                }
+            }
+
+            // 2. Yeni değerleri al
+            const newWinnerVal = parseInt(document.getElementById('editWinnerSelect').value);
+            const newPoints = { 'normal': 2, 'okey': 4, 'double': 8 }[editState.finish];
+
+            // 3. Yeni puanları düş
+            if(gameState.teamMode) {
+                const newLoser = (newWinnerVal === 0) ? 1 : 0;
+                gameState.scores[newLoser] -= newPoints;
+            } else {
+                for(let i=0; i<4; i++) {
+                    if(i !== newWinnerVal) gameState.scores[i] -= newPoints;
+                }
+            }
+
+            gameState.history[hIdx] = {
+                winnerMask: newWinnerVal,
+                finish: editState.finish,
+                points: newPoints
+            };
+
+            document.getElementById('editModal').classList.remove('active');
+            updateUI();
             saveState();
         }
 
-        function resetGame() { showDialog('Sıfırla', 'Sayfayı tamamen yenilemek ve oyunu sıfırlamak istiyor musunuz?', () => { localStorage.removeItem('okeyGameState'); window.location.reload(); }, 'danger'); }
-        function goHome() { if (gameState.gameActive) { showDialog('Ana Menü', 'Ana menüye dönmek istiyor musunuz? Mevcut oyun verileri silinecek.', () => { localStorage.removeItem('okeyGameState'); window.location.href = 'index.html'; }, 'danger'); } else { window.location.href = 'index.html'; } }
-        function updateStatus() { if (gameState.gameActive) { document.getElementById('status').textContent = `${gameState.startNumber} sayıdan - ${gameState.history.length} el`; } else { document.getElementById('status').textContent = 'Oyun Kurulumu'; } }
-        
-        function showDialog(title, message, onConfirm = null, type = 'confirm') {
-            document.getElementById('dialogTitle').textContent = title;
-            document.getElementById('dialogMessage').textContent = message;
-            const actionsDiv = document.getElementById('dialogActions');
-            actionsDiv.innerHTML = '';
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'dialog-btn dialog-btn-cancel';
-            cancelBtn.textContent = onConfirm ? 'Vazgeç' : 'Tamam';
-            cancelBtn.onclick = closeDialog;
-            actionsDiv.appendChild(cancelBtn);
-            if (onConfirm) {
-                const confirmBtn = document.createElement('button');
-                confirmBtn.className = type === 'danger' ? 'dialog-btn dialog-btn-danger' : 'dialog-btn dialog-btn-confirm';
-                confirmBtn.textContent = 'Evet';
-                confirmBtn.onclick = () => { onConfirm(); closeDialog(); };
-                actionsDiv.appendChild(confirmBtn);
-            }
-            document.getElementById('customDialog').classList.add('active');
+        function deleteRound(index) {
+            if(index !== gameState.history.length - 1) { alert("Sadece son el silinebilir"); return; }
+            
+            showDialog("Eli Sil", "Puanlar geri alınacak.", (yes)=>{
+                if(yes) {
+                    const round = gameState.history[index];
+                     if(gameState.teamMode) {
+                        const oldLoser = (round.winnerMask % 2 === 0) ? 1 : 0;
+                        gameState.scores[oldLoser] += round.points;
+                    } else {
+                        for(let i=0; i<4; i++) {
+                            if(i !== round.winnerMask) gameState.scores[i] += round.points;
+                        }
+                    }
+                    gameState.history.splice(index, 1);
+                    updateUI();
+                    saveState();
+                }
+            }, "danger");
         }
-        function closeDialog() { document.getElementById('customDialog').classList.remove('active'); }
+
+        function updateUI() {
+            if(!gameState.gameActive) {
+                document.getElementById('setupSection').classList.add('active');
+                document.getElementById('scoreboard').classList.remove('active');
+                return;
+            }
+            document.getElementById('setupSection').classList.remove('active');
+            document.getElementById('scoreboard').classList.add('active');
+
+            // MASA KARTLARI
+            const table = document.getElementById('gameTable');
+            const center = document.querySelector('.pos-center');
+            table.innerHTML = ''; table.appendChild(center);
+
+            // 4 Kartı yerleştir
+            // Eşli modda isimler Biz/Rakip dizisinden gelecek
+            // Bireysel modda isimler array'den.
+            
+            for(let i=0; i<4; i++) {
+                const name = gameState.playerNames[i];
+                let score = 0;
+                
+                if(gameState.teamMode) {
+                    // 0 ve 2 -> Biz (Score 0)
+                    // 1 ve 3 -> Rakip (Score 1)
+                    score = (i % 2 === 0) ? gameState.scores[0] : gameState.scores[1];
+                    
+                    // Renk kodu
+                    var teamClass = (i % 2 === 0) ? 'team-a' : 'team-b';
+                } else {
+                    score = gameState.scores[i];
+                    var teamClass = '';
+                }
+
+                const card = document.createElement('div');
+                card.className = `player-card ${POSITIONS[i]} ${teamClass}`;
+                card.onclick = () => onPlayerClick(i);
+                card.innerHTML = `<div class="p-name">${name}</div><div class="p-score">${score}</div>`;
+                table.appendChild(card);
+            }
+
+            // GEÇMİŞ
+            const hList = document.getElementById('historyList');
+            hList.innerHTML = '';
+            [...gameState.history].reverse().forEach((h, idx) => {
+                const realIdx = gameState.history.length - 1 - idx;
+                const finishName = { 'normal': 'Normal', 'okey': 'Okey', 'double': 'Katlama' }[h.finish];
+                const wName = gameState.playerNames[h.winnerMask];
+                
+                let delBtn = '';
+                if(realIdx === gameState.history.length - 1) delBtn = `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>`;
+
+                hList.innerHTML += `
+                    <div class="h-item">
+                        <div><strong>${realIdx+1}.</strong> ${wName} (${finishName})</div>
+                        <div><button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>${delBtn}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function saveState() { localStorage.setItem('okeyGameStatev12', JSON.stringify(gameState)); }
+        function loadState() {
+            const s = localStorage.getItem('okeyGameStatev12');
+            if(s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} }
+        }
+        function resetGame() {
+             showDialog("Sıfırla", "Her şey silinsin mi?", (y)=>{ if(y){ localStorage.removeItem('okeyGameStatev12'); window.location.reload(); } }, "danger");
+        }
+        function goHome() { if(gameState.gameActive) showDialog("Çıkış", "Menüye dön?", (y)=>{if(y) window.location.href='index.html';}, "normal"); else window.location.href='index.html'; }
+
+        function showDialog(title, msg, callback, type) {
+            const box = document.getElementById('customDialog');
+            document.getElementById('dTitle').textContent = title;
+            document.getElementById('dMsg').textContent = msg;
+            const act = document.getElementById('dActions');
+            act.innerHTML = '';
+            const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç"; b1.onclick = () => { box.classList.remove('active'); callback(false); };
+            const b2 = document.createElement('button'); b2.className = 'd-btn d-confirm'; b2.style.backgroundColor = type === 'danger' ? '#e74c3c' : '#667eea'; b2.textContent = "Evet"; b2.onclick = () => { box.classList.remove('active'); callback(true); };
+            act.appendChild(b1); act.appendChild(b2);
+            box.classList.add('active');
+        }
     </script>
 </body>
 </html>
