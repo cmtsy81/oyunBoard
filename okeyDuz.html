@@ -80,7 +80,7 @@
         .grid-2 { grid-template-columns: 1fr 1fr; }
 
         .btn-toggle { 
-            padding: 10px 2px; /* Yan boşlukları azalttık */
+            padding: 10px 2px;
             border: 2px solid #ddd; 
             background: white; 
             border-radius: 6px; 
@@ -89,14 +89,11 @@
             font-weight: 600; 
             color: #333; 
             width: 100%;
-            
-            /* YENİ: Yazıyı tek satıra zorla ve sığmazsa küçült */
             white-space: nowrap; 
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Küçük ekranlar için fontu biraz daha küçült */
         @media (max-width: 380px) {
             .btn-toggle { font-size: 10px; }
         }
@@ -111,19 +108,32 @@
         .history-section { margin-bottom: 20px; }
         .history-title { font-weight: 600; color: #333; margin-bottom: 12px; font-size: 14px; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
-        .history-item { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        .history-item-text { color: #333; }
+        
+        .history-item { 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 4px solid #667eea; 
+            font-size: 13px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .history-item-text { color: #333; display: flex; align-items: center; gap: 5px; }
+        .history-num { color: #667eea; font-weight: bold; min-width: 40px; }
+        
         .history-item-buttons { display: flex; gap: 8px; }
-        .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-        .btn-edit { background: #2196F3; color: white; }
-        .btn-delete { background: #f44336; color: white; }
+        .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; color: white;}
+        .btn-edit { background: #2196F3; }
+        .btn-delete { background: #f44336; }
 
         /* GAME OVER */
         .game-over { background: #fff3cd; padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px; display: none; }
         .game-over.active { display: block; }
         .game-over h2 { color: #856404; margin-bottom: 10px; font-size: 18px; }
 
-        /* MODAL (EDIT) */
+        /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 16px; }
         .modal.active { display: flex; align-items: flex-end; }
         .modal-content { background: white; border-radius: 12px 12px 0 0; padding: 20px; width: 100%; max-height: 90vh; overflow-y: auto; }
@@ -223,7 +233,7 @@
             </div>
         </div>
 
-        <div class="footer-version" id="footerVersion">v1.1.0</div>
+        <div class="footer-version" id="footerVersion">v1.1.1</div>
     </div>
 
     <div class="modal" id="editModal">
@@ -253,7 +263,7 @@
     </div>
 
     <script>
-        const APP_VERSION = '1.1.0'; 
+        const APP_VERSION = '1.1.1'; 
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
         let gameState = {
@@ -261,7 +271,7 @@
             teamMode: false,
             startNumber: 20,
             scores: [],
-            playerNames: [], // Dinamik olacak
+            playerNames: [],
             selectedWinner: null,
             selectedFinish: null,
             gameActive: false,
@@ -324,7 +334,6 @@
             gameState.teamMode = teamMode;
             gameState.startNumber = startNumber;
             
-            // YENİ İSİMLENDİRME MANTIĞI
             if (teamMode) {
                 gameState.playerNames = ['Biz', 'Rakip'];
             } else {
@@ -441,6 +450,7 @@
             saveState();
         }
 
+        // --- GÜNCELLENEN HISTORY FONKSİYONU ---
         function renderHistory() {
             const list = document.getElementById('historyList');
             list.innerHTML = '';
@@ -450,15 +460,24 @@
                 return;
             }
 
-            gameState.history.forEach((round, idx) => {
+            // Diziyi tersten dönerek son eli en üste koyuyoruz
+            [...gameState.history].reverse().forEach((round, reverseIndex) => {
+                // Gerçek indeksi (silme/düzenleme için) bul
+                const realIndex = gameState.history.length - 1 - reverseIndex;
+                // Görünen el numarasını (1'den başlayarak) hesapla
+                const handNumber = realIndex + 1;
+
                 const finishText = { 'normal': 'Normal (2)', 'okey': 'Okey (4)', 'double': 'Katlamalı (8)' };
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.innerHTML = `
-                    <div class="history-item-text"><strong>${gameState.playerNames[round.winner]}</strong> - ${finishText[round.finish]}</div>
+                    <div class="history-item-text">
+                        <span class="history-num">${handNumber}. El:</span> 
+                        <span><strong>${gameState.playerNames[round.winner]}</strong> - ${finishText[round.finish]}</span>
+                    </div>
                     <div class="history-item-buttons">
-                        <button class="btn-small btn-edit" onclick="openEditModal(${idx})">Düzenle</button>
-                        <button class="btn-small btn-delete" onclick="deleteRound(${idx})">Sil</button>
+                        <button class="btn-small btn-edit" onclick="openEditModal(${realIndex})">Düzenle</button>
+                        <button class="btn-small btn-delete" onclick="deleteRound(${realIndex})">Sil</button>
                     </div>
                 `;
                 list.appendChild(item);
@@ -618,7 +637,6 @@
             }
         }
 
-        // --- YENİ DIALOG SİSTEMİ ---
         function showDialog(title, message, onConfirm = null, type = 'confirm') {
             document.getElementById('dialogTitle').textContent = title;
             document.getElementById('dialogMessage').textContent = message;
