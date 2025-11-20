@@ -2,30 +2,19 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Okey Skor Takibi</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Pull-to-refresh'i zorlaştırmak için overscroll-behavior eklendi */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #f5f5f5;
+            overscroll-behavior-y: contain; 
         }
+        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- YENİ HEADER TASARIMI --- */
+        /* HEADER */
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -38,21 +27,9 @@
             top: 0;
             z-index: 10;
         }
-
-        .header-center {
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 20px;
-            margin-bottom: 2px;
-        }
-
-        .header .status {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
+        .header-center { text-align: center; }
+        .header h1 { font-size: 20px; margin-bottom: 2px; }
+        .header .status { font-size: 12px; opacity: 0.9; }
         .btn-icon {
             background: none;
             border: none;
@@ -66,365 +43,94 @@
             align-items: center;
             justify-content: center;
         }
+        .btn-icon:hover { background: rgba(255,255,255,0.2); }
 
-        .btn-icon:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        /* --------------------------- */
+        /* CONTENT */
+        .content { flex: 1; padding: 16px; overflow-y: auto; }
+        .setup-section { display: none; }
+        .setup-section.active { display: block; }
+        .setup-group { margin-bottom: 16px; }
+        .setup-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px; }
+        .setup-group input, .setup-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; }
+        .setup-buttons { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-start { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
 
-        .content {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-        }
-
-        .setup-section {
-            display: none;
-        }
-
-        .setup-section.active {
-            display: block;
-        }
-
-        .setup-group {
-            margin-bottom: 16px;
-        }
-
-        .setup-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .setup-group input,
-        .setup-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-        }
-
-        .setup-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-start {
-            flex: 1;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .scoreboard {
-            display: none;
-        }
-
-        .scoreboard.active {
-            display: block;
-        }
-
+        /* SCOREBOARD */
+        .scoreboard { display: none; }
+        .scoreboard.active { display: block; }
+        
         .scores-display {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
             gap: 8px;
             margin-bottom: 16px;
         }
 
-        .score-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px 8px;
-            border-radius: 8px;
-            text-align: center;
-        }
+        .score-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 8px; border-radius: 8px; text-align: center; }
+        .score-card.team2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .score-name { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
+        .score-value { font-size: 32px; font-weight: bold; }
 
-        .score-card.team2 {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .score-name {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
-
-        .score-value {
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-
-        .controls-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            white-space: nowrap;
-            min-width: 80px;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 6px;
-            flex: 1;
-        }
-
-        .button-group.four {
+        /* CONTROLS */
+        .controls-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+        .controls-label { font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; min-width: 80px; }
+        
+        .button-group { 
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 6px;
+            gap: 6px; 
+            flex: 1; 
         }
 
-        .button-group.three {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-        }
+        .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
 
-        .btn-toggle {
-            padding: 10px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-        }
+        .btn-toggle { padding: 10px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #333; width: 100%; }
+        .btn-toggle.selected { background: #667eea; color: white; border-color: #667eea; }
+        .btn-toggle.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
+        .confirm-btn { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+        .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-        .btn-toggle.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
+        /* HISTORY */
+        .history-section { margin-bottom: 20px; }
+        .history-title { font-weight: 600; color: #333; margin-bottom: 12px; font-size: 14px; }
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+        .history-item-text { color: #333; }
+        .history-item-buttons { display: flex; gap: 8px; }
+        .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-edit { background: #2196F3; color: white; }
+        .btn-delete { background: #f44336; color: white; }
 
-        .btn-toggle.finish-selected {
-            background: #4caf50;
-            color: white;
-            border-color: #4caf50;
-        }
+        /* GAME OVER */
+        .game-over { background: #fff3cd; padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px; display: none; }
+        .game-over.active { display: block; }
+        .game-over h2 { color: #856404; margin-bottom: 10px; font-size: 18px; }
 
-        .confirm-btn {
-            width: 100%;
-            padding: 14px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 16px;
-        }
-
-        .confirm-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .history-section {
-            margin-bottom: 20px;
-        }
-
-        .history-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .history-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #667eea;
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-item-text {
-            color: #333;
-        }
-
-        .history-item-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btn-edit {
-            background: #2196F3;
-            color: white;
-        }
-
-        .btn-delete {
-            background: #f44336;
-            color: white;
-        }
-
-        .game-over {
-            background: #fff3cd;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .game-over.active {
-            display: block;
-        }
-
-        .game-over h2 {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            padding: 16px;
-        }
-
-        .modal.active {
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px 12px 0 0;
-            padding: 20px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #333;
-        }
-
-        .modal-group {
-            margin-bottom: 16px;
-        }
-
-        .modal-label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .modal-btn {
-            flex: 1;
-            min-width: 70px;
-            padding: 10px;
-            border: 2px solid #ddd;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .modal-btn.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .modal-btn.finish-selected {
-            background: #4caf50;
-            color: white;
-            border-color: #4caf50;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .modal-save {
-            flex: 1;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .modal-cancel {
-            flex: 1;
-            padding: 12px;
-            background: #e0e0e0;
-            color: #333;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 16px; }
+        .modal.active { display: flex; align-items: flex-end; }
+        .modal-content { background: white; border-radius: 12px 12px 0 0; padding: 20px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #333; }
+        .modal-group { margin-bottom: 16px; }
+        .modal-label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
+        .modal-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+        .modal-btn { flex: 1; min-width: 70px; padding: 10px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .modal-btn.selected { background: #667eea; color: white; border-color: #667eea; }
+        .modal-btn.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
+        .modal-footer { display: flex; gap: 10px; margin-top: 16px; }
+        .modal-save { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .modal-cancel { flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <button class="btn-icon" onclick="goHome()" title="Ana Sayfa">🏠</button>
+            <button class="btn-icon" onclick="goHome()" title="Ana Menü">🏠</button>
             <div class="header-center">
                 <h1>🃏 Okey</h1>
                 <div class="status" id="status">Oyun Kurulumu</div>
             </div>
-            <button class="btn-icon" onclick="resetGame()" title="Sıfırla">🔄</button>
+            <button class="btn-icon" onclick="resetGame()" title="Oyunu Sıfırla">🔄</button>
         </div>
 
         <div class="content">
@@ -456,12 +162,12 @@
 
                 <div class="controls-row">
                     <div class="controls-label">Kim bitti?</div>
-                    <div class="button-group four" id="winnerSelect"></div>
+                    <div class="button-group" id="winnerSelect"></div>
                 </div>
 
                 <div class="controls-row">
                     <div class="controls-label">Nasıl bitti?</div>
-                    <div class="button-group three">
+                    <div class="button-group grid-3">
                         <button class="btn-toggle" onclick="selectFinish('normal', this)">Normal (2)</button>
                         <button class="btn-toggle" onclick="selectFinish('okey', this)">Okey (4)</button>
                         <button class="btn-toggle" onclick="selectFinish('double', this)">Katlamalı (8)</button>
@@ -476,7 +182,7 @@
                 </div>
             </div>
         </div>
-        </div>
+    </div>
 
     <div class="modal" id="editModal">
         <div class="modal-content">
@@ -510,6 +216,36 @@
 
         let editingRoundIndex = null;
 
+        // --- YENİ: Sayfa Yüklendiğinde Hafızayı Kontrol Et ---
+        window.onload = function() {
+            loadState();
+        }
+
+        function saveState() {
+            localStorage.setItem('okeyGameState', JSON.stringify(gameState));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('okeyGameState');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                if (gameState.gameActive) {
+                    // Oyun aktifse arayüzü kur
+                    document.getElementById('setupSection').classList.remove('active');
+                    document.getElementById('scoreboard').classList.add('active');
+                    document.getElementById('gameOver').classList.remove('active');
+
+                    // Grid sınıflarını geri yükle
+                    const gridClass = gameState.teamMode ? 'grid-2' : 'grid-4';
+                    document.getElementById('scoresDisplay').className = 'scores-display ' + gridClass;
+                    document.getElementById('winnerSelect').className = 'button-group ' + gridClass;
+
+                    renderScoreboard();
+                    updateStatus();
+                }
+            }
+        }
+
         function startGame() {
             const teamMode = document.getElementById('teamMode').value === 'true';
             const startNumber = parseInt(document.getElementById('startNumber').value);
@@ -527,12 +263,20 @@
             gameState.gameActive = true;
             gameState.history = [];
 
+            const gridClass = teamMode ? 'grid-2' : 'grid-4';
+            const scoresDisplay = document.getElementById('scoresDisplay');
+            scoresDisplay.className = 'scores-display ' + gridClass;
+            
+            const winnerSelect = document.getElementById('winnerSelect');
+            winnerSelect.className = 'button-group ' + gridClass;
+
             document.getElementById('setupSection').classList.remove('active');
             document.getElementById('scoreboard').classList.add('active');
             document.getElementById('gameOver').classList.remove('active');
 
             renderScoreboard();
             updateStatus();
+            saveState(); // KAYDET
         }
 
         function renderScoreboard() {
@@ -619,6 +363,7 @@
                 updateConfirmBtn();
                 updateStatus();
             }
+            saveState(); // KAYDET
         }
 
         function renderHistory() {
@@ -645,7 +390,6 @@
             });
         }
 
-        // YENİ: SİLME ONAYI EKLENDİ
         function deleteRound(idx) {
             if (!confirm('Bu eli silmek istediğinize emin misiniz? Puanlar geri alınacak.')) {
                 return;
@@ -663,6 +407,7 @@
             gameState.history.splice(idx, 1);
             renderScoreboard();
             updateStatus();
+            saveState(); // KAYDET
         }
 
         function openEditModal(idx) {
@@ -745,6 +490,7 @@
             closeEditModal();
             renderScoreboard();
             updateStatus();
+            saveState(); // KAYDET
         }
 
         function endGame(loserIndex) {
@@ -755,51 +501,28 @@
             document.getElementById('gameOverMessage').textContent = `🎉 Oyun Bitti!\n${winnerName} kaybetti!`;
             document.getElementById('gameOver').classList.add('active');
             document.getElementById('scoreboard').classList.remove('active');
+            saveState(); // Biten oyunu da kaydet ki yenilenince kaybolmasın
         }
 
-        // YENİ: SADECE OYUNU BAŞA SARAR
+        // --- GÜNCELLENEN FONKSİYONLAR ---
+
         function resetGame() {
-            // Eğer oyun aktif değilse (kurulum ekranındaysa) zaten gerek yok
-            if (!gameState.gameActive) {
-                 // Formu temizlemek isteyip istemediğini sorabiliriz, ama genelde kurulumda reset basılmaz.
-                 // Yine de standart olsun:
-                 if(confirm('Ayarları sıfırlamak istiyor musunuz?')) {
-                     location.reload();
-                 }
-                 return;
-            }
-
-            if (confirm('Mevcut oyunu ve skorları sıfırlamak istiyor musunuz? (Ayarlar korunur)')) {
-                // Ayarları koru, oyunu yeniden başlat
-                gameState.scores = Array(gameState.teamMode ? 2 : 4).fill(gameState.startNumber);
-                gameState.selectedWinner = null;
-                gameState.selectedFinish = null;
-                gameState.history = [];
-                
-                document.getElementById('gameOver').classList.remove('active');
-                document.getElementById('scoreboard').classList.add('active');
-                
-                renderScoreboard();
-                updateStatus();
+            if (confirm('Sayfayı tamamen yenilemek ve oyunu sıfırlamak istiyor musunuz?')) {
+                // ÖNCE HAFIZAYI SİL
+                localStorage.removeItem('okeyGameState');
+                // SONRA SAYFAYI YENİLE
+                window.location.reload();
             }
         }
 
-        // YENİ: ANA EKRANA DÖNER
         function goHome() {
             if (gameState.gameActive) {
-                if (confirm('Ana menüye dönmek istiyor musunuz? Mevcut oyun sonlandırılacak.')) {
-                    gameState.gameActive = false;
-                    gameState.selectedWinner = null;
-                    gameState.selectedFinish = null;
-                    gameState.history = [];
-                    
-                    document.getElementById('setupSection').classList.add('active');
-                    document.getElementById('scoreboard').classList.remove('active');
-                    document.getElementById('gameOver').classList.remove('active');
-                    document.getElementById('status').textContent = 'Oyun kurulumunu başlatın';
+                if (confirm('Ana menüye dönmek istiyor musunuz? Mevcut oyun verileri silinecek.')) {
+                    localStorage.removeItem('okeyGameState'); // Çıkışta sil
+                    window.location.href = 'index.html';
                 }
             } else {
-                // Zaten ana ekrandaysa bir şey yapmaya gerek yok veya sayfayı yenileyebiliriz
+                window.location.href = 'index.html';
             }
         }
 
@@ -807,7 +530,7 @@
             if (gameState.gameActive) {
                 document.getElementById('status').textContent = `${gameState.startNumber} sayıdan - ${gameState.history.length} el`;
             } else {
-                document.getElementById('status').textContent = 'Oyun kurulumunu başlatın';
+                document.getElementById('status').textContent = 'Oyun Kurulumu';
             }
         }
     </script>
