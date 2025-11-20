@@ -5,141 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oyunlar & Araçlar</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            min-height: 100vh;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .menu-grid {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        @media (min-width: 480px) {
-            .menu-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .menu-card {
-            display: flex;
-            align-items: center;
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 16px; /* Daha yuvarlak köşeler */
-            padding: 15px;
-            text-decoration: none;
-            color: #333;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        /* Sol Şeritler */
-        .menu-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .header { background: linear-gradient(135deg, #2d3436 0%, #636e72 100%); color: white; padding: 30px 20px; text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .menu-grid { padding: 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        @media (min-width: 480px) { .menu-grid { grid-template-columns: 1fr 1fr; } }
+        .menu-card { display: flex; align-items: center; background: white; border: 1px solid #eee; border-radius: 16px; padding: 15px; text-decoration: none; color: #333; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; overflow: hidden; cursor: pointer; }
+        .menu-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .menu-card:active { transform: scale(0.98); } /* Tıklama efekti */
+        .menu-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; }
         .card-okey-duz::before { background: linear-gradient(to bottom, #667eea, #764ba2); }
         .card-okey-101::before { background: linear-gradient(to bottom, #ff6b6b, #ee5253); }
         .card-zar::before { background: linear-gradient(to bottom, #00b894, #00cec9); }
-
-        /* Resim Alanı */
-        .card-img-container {
-            width: 60px;
-            height: 60px;
-            margin-right: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f0f0f0; /* Resim yoksa gri görünür */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0; /* Resmin sıkışmasını engeller */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .card-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Resmi kutuya sığdırır */
-        }
-
-        .card-content h3 {
-            font-size: 17px;
-            margin-bottom: 4px;
-            font-weight: 700;
-        }
-
-        .card-content p {
-            font-size: 13px;
-            color: #666;
-        }
-
-        .version {
-            margin-top: auto;
-            text-align: center;
-            padding: 20px;
-            font-size: 11px;
-            color: #aaa;
-        }
+        .card-img-container { width: 60px; height: 60px; margin-right: 15px; border-radius: 12px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-content h3 { font-size: 17px; margin-bottom: 4px; font-weight: 700; }
+        .card-content p { font-size: 13px; color: #666; }
+        .version { margin-top: auto; text-align: center; padding: 20px; font-size: 11px; color: #aaa; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header">
             <h1>Ana Menü</h1>
@@ -147,7 +35,6 @@
         </div>
 
         <div class="menu-grid">
-            
             <a href="okeyDuz.html" class="menu-card card-okey-duz">
                 <div class="card-img-container">
                     <img src="img/okey.png" alt="Okey" class="card-img" onerror="this.src='https://placehold.co/60x60/667eea/white?text=OKEY'">
@@ -157,7 +44,6 @@
                     <p>Düşmeli skor takibi</p>
                 </div>
             </a>
-
             <a href="okey101.html" class="menu-card card-okey-101">
                 <div class="card-img-container">
                     <img src="img/101.png" alt="101" class="card-img" onerror="this.src='https://placehold.co/60x60/ff6b6b/white?text=101'">
@@ -167,7 +53,6 @@
                     <p>Katlamalı hesaplama</p>
                 </div>
             </a>
-
             <a href="zarAt.html" class="menu-card card-zar">
                 <div class="card-img-container">
                     <img src="img/zar.png" alt="Zar" class="card-img" onerror="this.src='https://placehold.co/60x60/00b894/white?text=ZAR'">
@@ -177,13 +62,38 @@
                     <p>3D Zar Simülasyonu</p>
                 </div>
             </a> 
-
         </div>
 
-        <div class="version">
-            v1.1.2
-        </div>
+        <div class="version">v1.0.0</div>
     </div>
 
+    <script>
+        // --- SES EFEKTİ MOTORU ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playClick() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            // Tok bir 'tık' sesi ayarları
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // Tüm 'a' etiketlerine (kartlara) ses ekle
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => playClick());
+        });
+    </script>
 </body>
 </html>

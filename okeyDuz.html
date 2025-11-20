@@ -6,44 +6,15 @@
     <title>Okey Skor Takibi</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f5f5f5;
-            overscroll-behavior-y: contain; 
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; overscroll-behavior-y: contain; }
         .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
-
         /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; }
         .header-center { text-align: center; }
         .header h1 { font-size: 20px; margin-bottom: 2px; }
         .header .status { font-size: 12px; opacity: 0.9; }
-        .btn-icon {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .btn-icon { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
         .btn-icon:hover { background: rgba(255,255,255,0.2); }
-
         /* CONTENT */
         .content { flex: 1; padding: 16px; overflow-y: auto; }
         .setup-section { display: none; }
@@ -53,86 +24,42 @@
         .setup-group input, .setup-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; }
         .setup-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .btn-start { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-
         /* SCOREBOARD */
         .scoreboard { display: none; }
         .scoreboard.active { display: block; }
-        
-        .scores-display {
-            display: grid;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
+        .scores-display { display: grid; gap: 8px; margin-bottom: 16px; }
         .score-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 8px; border-radius: 8px; text-align: center; }
         .score-card.team2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .score-name { font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
         .score-value { font-size: 32px; font-weight: bold; }
-
         /* CONTROLS */
         .controls-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
         .controls-label { font-size: 12px; font-weight: 600; color: #333; white-space: nowrap; min-width: 80px; }
-        
         .button-group { display: grid; gap: 6px; flex: 1; }
-
         .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
-
-        .btn-toggle { 
-            padding: 10px 2px;
-            border: 2px solid #ddd; 
-            background: white; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 600; 
-            color: #333; 
-            width: 100%;
-            white-space: nowrap; 
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @media (max-width: 380px) {
-            .btn-toggle { font-size: 10px; }
-        }
-
+        .btn-toggle { padding: 10px 2px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #333; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @media (max-width: 380px) { .btn-toggle { font-size: 10px; } }
         .btn-toggle.selected { background: #667eea; color: white; border-color: #667eea; }
         .btn-toggle.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
-        
         .confirm-btn { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
         .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
-
         /* HISTORY */
         .history-section { margin-bottom: 20px; }
         .history-title { font-weight: 600; color: #333; margin-bottom: 12px; font-size: 14px; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
-        
-        .history-item { 
-            background: #f8f9fa; 
-            padding: 12px; 
-            border-radius: 6px; 
-            border-left: 4px solid #667eea; 
-            font-size: 13px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        
+        .history-item { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #667eea; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
         .history-item-text { color: #333; display: flex; align-items: center; gap: 5px; }
         .history-num { color: #667eea; font-weight: bold; min-width: 40px; }
-        
         .history-item-buttons { display: flex; gap: 8px; }
         .btn-small { padding: 6px 12px; font-size: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; color: white;}
         .btn-edit { background: #2196F3; }
         .btn-delete { background: #f44336; }
-
         /* GAME OVER */
         .game-over { background: #fff3cd; padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px; display: none; }
         .game-over.active { display: block; }
         .game-over h2 { color: #856404; margin-bottom: 10px; font-size: 18px; }
-
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; padding: 16px; }
         .modal.active { display: flex; align-items: flex-end; }
@@ -147,7 +74,6 @@
         .modal-footer { display: flex; gap: 10px; margin-top: 16px; }
         .modal-save { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .modal-cancel { flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-
         /* DIALOG */
         .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease-out; }
         .custom-dialog.active { display: flex; }
@@ -160,16 +86,7 @@
         .dialog-btn-confirm { background: #667eea; color: white; }
         .dialog-btn-danger { background: #f44336; color: white; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* FOOTER */
-        .footer-version {
-            text-align: center;
-            padding: 10px;
-            font-size: 11px;
-            color: #aaa;
-            background: #f9f9f9;
-            border-top: 1px solid #eee;
-        }
+        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; background: #f9f9f9; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -192,12 +109,10 @@
                         <option value="true">Evet (2 takım)</option>
                     </select>
                 </div>
-
                 <div class="setup-group">
                     <label>Hangi sayıdan düşülsün?</label>
                     <input type="number" id="startNumber" value="20" min="1" max="100">
                 </div>
-
                 <div class="setup-buttons">
                     <button class="btn-start" onclick="startGame()">Oyunu Başlat</button>
                 </div>
@@ -209,12 +124,10 @@
 
             <div class="scoreboard" id="scoreboard">
                 <div class="scores-display" id="scoresDisplay"></div>
-
                 <div class="controls-row">
                     <div class="controls-label">Kim bitti?</div>
                     <div class="button-group" id="winnerSelect"></div>
                 </div>
-
                 <div class="controls-row">
                     <div class="controls-label">Nasıl bitti?</div>
                     <div class="button-group grid-3">
@@ -223,141 +136,106 @@
                         <button class="btn-toggle" onclick="selectFinish('double', this)">Katlamalı (8)</button>
                     </div>
                 </div>
-
                 <button class="confirm-btn" id="confirmBtn" onclick="submitRound()" disabled>El Kaydet</button>
-
                 <div class="history-section" id="historySection">
                     <div class="history-title">El Geçmişi</div>
                     <div class="history-list" id="historyList"></div>
                 </div>
             </div>
         </div>
-
-        <div class="footer-version" id="footerVersion">v1.1.1</div>
+        <div class="footer-version" id="footerVersion">v1.0.0</div>
     </div>
 
     <div class="modal" id="editModal">
         <div class="modal-content">
             <div class="modal-header">El Düzenle</div>
-            <div class="modal-group">
-                <div class="modal-label">Kimin bitti?</div>
-                <div class="modal-buttons" id="editWinnerSelect"></div>
-            </div>
-            <div class="modal-group">
-                <div class="modal-label">Nasıl bitti?</div>
-                <div class="modal-buttons" id="editFinishSelect"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="modal-cancel" onclick="closeEditModal()">İptal</button>
-                <button class="modal-save" onclick="saveEditRound()">Kaydet</button>
-            </div>
+            <div class="modal-group"><div class="modal-label">Kimin bitti?</div><div class="modal-buttons" id="editWinnerSelect"></div></div>
+            <div class="modal-group"><div class="modal-label">Nasıl bitti?</div><div class="modal-buttons" id="editFinishSelect"></div></div>
+            <div class="modal-footer"><button class="modal-cancel" onclick="closeEditModal()">İptal</button><button class="modal-save" onclick="saveEditRound()">Kaydet</button></div>
         </div>
     </div>
-
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <div class="dialog-title" id="dialogTitle">Başlık</div>
-            <div class="dialog-message" id="dialogMessage">Mesaj</div>
+            <div class="dialog-title" id="dialogTitle"></div>
+            <div class="dialog-message" id="dialogMessage"></div>
             <div class="dialog-actions" id="dialogActions"></div>
         </div>
     </div>
 
     <script>
-        const APP_VERSION = '1.1.1'; 
+        const APP_VERSION = '1.0.0'; 
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
-        let gameState = {
-            version: APP_VERSION,
-            teamMode: false,
-            startNumber: 20,
-            scores: [],
-            playerNames: [],
-            selectedWinner: null,
-            selectedFinish: null,
-            gameActive: false,
-            history: []
-        };
+        // --- SES EFEKTLERİ ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClick() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+        // Tüm butonlara ses dinleyicisi ekle (Event Delegation)
+        document.addEventListener('click', function(e) {
+            if(e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                playClick();
+            }
+        });
+        // --------------------
 
+        let gameState = { version: APP_VERSION, teamMode: false, startNumber: 20, scores: [], playerNames: [], selectedWinner: null, selectedFinish: null, gameActive: false, history: [] };
         let editingRoundIndex = null;
 
-        window.onload = function() {
-            loadState();
-        }
+        window.onload = function() { loadState(); }
 
-        function saveState() {
-            gameState.version = APP_VERSION;
-            localStorage.setItem('okeyGameState', JSON.stringify(gameState));
-        }
-
+        function saveState() { gameState.version = APP_VERSION; localStorage.setItem('okeyGameState', JSON.stringify(gameState)); }
         function loadState() {
             const saved = localStorage.getItem('okeyGameState');
             if (saved) {
                 try {
                     const loadedState = JSON.parse(saved);
-                    
-                    if (loadedState.version !== APP_VERSION) {
-                        console.log("Eski versiyon tespit edildi. Veriler temizleniyor...");
-                        localStorage.removeItem('okeyGameState');
-                        return; 
-                    }
-
+                    if (loadedState.version !== APP_VERSION) { localStorage.removeItem('okeyGameState'); return; }
                     gameState = loadedState;
-
                     if (gameState.gameActive) {
                         document.getElementById('setupSection').classList.remove('active');
                         document.getElementById('scoreboard').classList.add('active');
                         document.getElementById('gameOver').classList.remove('active');
-
                         const gridClass = gameState.teamMode ? 'grid-2' : 'grid-4';
                         document.getElementById('scoresDisplay').className = 'scores-display ' + gridClass;
                         document.getElementById('winnerSelect').className = 'button-group ' + gridClass;
-
                         renderScoreboard();
                         updateStatus();
                     }
-                } catch (e) {
-                    console.error("Kayıt dosyası bozuk, sıfırlanıyor.");
-                    localStorage.removeItem('okeyGameState');
-                }
+                } catch (e) { localStorage.removeItem('okeyGameState'); }
             }
         }
 
         function startGame() {
             const teamMode = document.getElementById('teamMode').value === 'true';
             const startNumber = parseInt(document.getElementById('startNumber').value);
-
-            if (startNumber < 1) {
-                showDialog('Hata', 'Lütfen geçerli bir sayı girin', null, 'normal');
-                return;
-            }
-
+            if (startNumber < 1) { showDialog('Hata', 'Lütfen geçerli bir sayı girin', null, 'normal'); return; }
             gameState.teamMode = teamMode;
             gameState.startNumber = startNumber;
-            
-            if (teamMode) {
-                gameState.playerNames = ['Biz', 'Rakip'];
-            } else {
-                gameState.playerNames = ['Ben', 'Sol', 'Karşı', 'Sağ'];
-            }
-
+            gameState.playerNames = teamMode ? ['Biz', 'Rakip'] : ['Ben', 'Sol', 'Karşı', 'Sağ'];
             gameState.scores = Array(teamMode ? 2 : 4).fill(startNumber);
             gameState.selectedWinner = null;
             gameState.selectedFinish = null;
             gameState.gameActive = true;
             gameState.history = [];
             gameState.version = APP_VERSION;
-
             const gridClass = teamMode ? 'grid-2' : 'grid-4';
-            const scoresDisplay = document.getElementById('scoresDisplay');
-            scoresDisplay.className = 'scores-display ' + gridClass;
-            
-            const winnerSelect = document.getElementById('winnerSelect');
-            winnerSelect.className = 'button-group ' + gridClass;
-
+            document.getElementById('scoresDisplay').className = 'scores-display ' + gridClass;
+            document.getElementById('winnerSelect').className = 'button-group ' + gridClass;
             document.getElementById('setupSection').classList.remove('active');
             document.getElementById('scoreboard').classList.add('active');
             document.getElementById('gameOver').classList.remove('active');
-
             renderScoreboard();
             updateStatus();
             saveState();
@@ -366,14 +244,12 @@
         function renderScoreboard() {
             const display = document.getElementById('scoresDisplay');
             display.innerHTML = '';
-
             gameState.scores.forEach((score, index) => {
                 const card = document.createElement('div');
                 card.className = `score-card ${gameState.teamMode && index === 1 ? 'team2' : ''}`;
                 card.innerHTML = `<div class="score-name">${gameState.playerNames[index]}</div><div class="score-value">${score}</div>`;
                 display.appendChild(card);
             });
-
             renderWinnerSelect();
             renderHistory();
         }
@@ -381,15 +257,12 @@
         function renderWinnerSelect() {
             const select = document.getElementById('winnerSelect');
             select.innerHTML = '';
-
             gameState.scores.forEach((score, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'btn-toggle';
                 btn.textContent = gameState.playerNames[index];
                 btn.onclick = () => selectWinner(index, btn);
-                if (gameState.selectedWinner === index) {
-                    btn.classList.add('selected');
-                }
+                if (gameState.selectedWinner === index) btn.classList.add('selected');
                 select.appendChild(btn);
             });
         }
@@ -415,102 +288,51 @@
 
         function submitRound() {
             if (gameState.selectedWinner === null || gameState.selectedFinish === null) return;
-
             const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
             const points = pointMap[gameState.selectedFinish];
             const winner = gameState.selectedWinner;
-
-            gameState.history.push({
-                winner: winner,
-                finish: gameState.selectedFinish,
-                points: points
-            });
-
-            for (let i = 0; i < gameState.scores.length; i++) {
-                if (i !== winner) {
-                    gameState.scores[i] -= points;
-                }
-            }
-
+            gameState.history.push({ winner: winner, finish: gameState.selectedFinish, points: points });
+            for (let i = 0; i < gameState.scores.length; i++) { if (i !== winner) gameState.scores[i] -= points; }
             gameState.selectedWinner = null;
             gameState.selectedFinish = null;
             document.querySelectorAll('#winnerSelect .btn-toggle').forEach(b => b.classList.remove('selected'));
             document.querySelectorAll('.button-group .btn-toggle').forEach(b => b.classList.remove('finish-selected'));
-
             const loserIndex = gameState.scores.findIndex(s => s <= 0);
-            
-            if (loserIndex !== -1) {
-                gameState.gameActive = false;
-                endGame(loserIndex);
-            } else {
-                renderScoreboard();
-                updateConfirmBtn();
-                updateStatus();
-            }
+            if (loserIndex !== -1) { gameState.gameActive = false; endGame(loserIndex); } else { renderScoreboard(); updateConfirmBtn(); updateStatus(); }
             saveState();
         }
 
-        // --- GÜNCELLENEN HISTORY FONKSİYONU ---
         function renderHistory() {
             const list = document.getElementById('historyList');
             list.innerHTML = '';
-
-            if (gameState.history.length === 0) {
-                list.innerHTML = '<div style="color: #999; font-size: 13px;">Henüz el kaydı yok</div>';
-                return;
-            }
-
-            // Diziyi tersten dönerek son eli en üste koyuyoruz
+            if (gameState.history.length === 0) { list.innerHTML = '<div style="color: #999; font-size: 13px;">Henüz el kaydı yok</div>'; return; }
             [...gameState.history].reverse().forEach((round, reverseIndex) => {
-                // Gerçek indeksi (silme/düzenleme için) bul
                 const realIndex = gameState.history.length - 1 - reverseIndex;
-                // Görünen el numarasını (1'den başlayarak) hesapla
                 const handNumber = realIndex + 1;
-
                 const finishText = { 'normal': 'Normal (2)', 'okey': 'Okey (4)', 'double': 'Katlamalı (8)' };
                 const item = document.createElement('div');
                 item.className = 'history-item';
                 item.innerHTML = `
-                    <div class="history-item-text">
-                        <span class="history-num">${handNumber}. El:</span> 
-                        <span><strong>${gameState.playerNames[round.winner]}</strong> - ${finishText[round.finish]}</span>
-                    </div>
-                    <div class="history-item-buttons">
-                        <button class="btn-small btn-edit" onclick="openEditModal(${realIndex})">Düzenle</button>
-                        <button class="btn-small btn-delete" onclick="deleteRound(${realIndex})">Sil</button>
-                    </div>
+                    <div class="history-item-text"><span class="history-num">${handNumber}. El:</span><span><strong>${gameState.playerNames[round.winner]}</strong> - ${finishText[round.finish]}</span></div>
+                    <div class="history-item-buttons"><button class="btn-small btn-edit" onclick="openEditModal(${realIndex})">Düzenle</button><button class="btn-small btn-delete" onclick="deleteRound(${realIndex})">Sil</button></div>
                 `;
                 list.appendChild(item);
             });
         }
 
         function deleteRound(idx) {
-            showDialog(
-                'Eli Sil', 
-                'Bu eli silmek istediğinize emin misiniz? Puanlar geri alınacak.', 
-                () => {
-                    const round = gameState.history[idx];
-                    const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
-
-                    for (let i = 0; i < gameState.scores.length; i++) {
-                        if (i !== round.winner) {
-                            gameState.scores[i] += pointMap[round.finish];
-                        }
-                    }
-
-                    gameState.history.splice(idx, 1);
-                    renderScoreboard();
-                    updateStatus();
-                    saveState();
-                },
-                'danger'
-            );
+            showDialog('Eli Sil', 'Bu eli silmek istediğinize emin misiniz? Puanlar geri alınacak.', () => {
+                const round = gameState.history[idx];
+                const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
+                for (let i = 0; i < gameState.scores.length; i++) { if (i !== round.winner) gameState.scores[i] += pointMap[round.finish]; }
+                gameState.history.splice(idx, 1);
+                renderScoreboard(); updateStatus(); saveState();
+            }, 'danger');
         }
 
         function openEditModal(idx) {
             editingRoundIndex = idx;
             const round = gameState.history[idx];
-
             const winnerSelect = document.getElementById('editWinnerSelect');
             winnerSelect.innerHTML = '';
             gameState.scores.forEach((score, index) => {
@@ -518,16 +340,10 @@
                 btn.className = 'modal-btn';
                 btn.textContent = gameState.playerNames[index];
                 btn.dataset.winner = index;
-                btn.onclick = () => {
-                    document.querySelectorAll('#editWinnerSelect .modal-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                };
-                if (round.winner === index) {
-                    btn.classList.add('selected');
-                }
+                btn.onclick = () => { document.querySelectorAll('#editWinnerSelect .modal-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); };
+                if (round.winner === index) btn.classList.add('selected');
                 winnerSelect.appendChild(btn);
             });
-
             const finishSelect = document.getElementById('editFinishSelect');
             finishSelect.innerHTML = '';
             ['normal', 'okey', 'double'].forEach(type => {
@@ -536,139 +352,62 @@
                 btn.className = 'modal-btn';
                 btn.textContent = finishText[type];
                 btn.dataset.finish = type;
-                btn.onclick = () => {
-                    document.querySelectorAll('#editFinishSelect .modal-btn').forEach(b => b.classList.remove('finish-selected'));
-                    btn.classList.add('finish-selected');
-                };
-                if (round.finish === type) {
-                    btn.classList.add('finish-selected');
-                }
+                btn.onclick = () => { document.querySelectorAll('#editFinishSelect .modal-btn').forEach(b => b.classList.remove('finish-selected')); btn.classList.add('finish-selected'); };
+                if (round.finish === type) btn.classList.add('finish-selected');
                 finishSelect.appendChild(btn);
             });
-
             document.getElementById('editModal').classList.add('active');
         }
 
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-            editingRoundIndex = null;
-        }
-
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); editingRoundIndex = null; }
+        
         function saveEditRound() {
             const winnerBtn = document.querySelector('#editWinnerSelect .modal-btn.selected');
             const finishBtn = document.querySelector('#editFinishSelect .modal-btn.finish-selected');
-
             if (!winnerBtn || !finishBtn) return;
-
             const newWinner = parseInt(winnerBtn.dataset.winner);
             const newFinish = finishBtn.dataset.finish;
             const oldRound = gameState.history[editingRoundIndex];
             const pointMap = { 'normal': 2, 'okey': 4, 'double': 8 };
-
-            for (let i = 0; i < gameState.scores.length; i++) {
-                if (i !== oldRound.winner) {
-                    gameState.scores[i] += pointMap[oldRound.finish];
-                }
-            }
-
+            for (let i = 0; i < gameState.scores.length; i++) { if (i !== oldRound.winner) gameState.scores[i] += pointMap[oldRound.finish]; }
             const newPoints = pointMap[newFinish];
-            for (let i = 0; i < gameState.scores.length; i++) {
-                if (i !== newWinner) {
-                    gameState.scores[i] -= newPoints;
-                }
-            }
-
-            gameState.history[editingRoundIndex] = {
-                winner: newWinner,
-                finish: newFinish,
-                points: newPoints
-            };
-
-            closeEditModal();
-            renderScoreboard();
-            updateStatus();
-            saveState();
+            for (let i = 0; i < gameState.scores.length; i++) { if (i !== newWinner) gameState.scores[i] -= newPoints; }
+            gameState.history[editingRoundIndex] = { winner: newWinner, finish: newFinish, points: newPoints };
+            closeEditModal(); renderScoreboard(); updateStatus(); saveState();
         }
 
         function endGame(loserIndex) {
-            const winnerName = gameState.teamMode ? 
-                (loserIndex === 0 ? 'Takım 2 (Rakip)' : 'Takım 1 (Biz)') :
-                gameState.playerNames[loserIndex];
-            
+            const winnerName = gameState.teamMode ? (loserIndex === 0 ? 'Takım 2 (Rakip)' : 'Takım 1 (Biz)') : gameState.playerNames[loserIndex];
             document.getElementById('gameOverMessage').textContent = `🎉 Oyun Bitti!\n${winnerName} kaybetti!`;
             document.getElementById('gameOver').classList.add('active');
             document.getElementById('scoreboard').classList.remove('active');
             saveState();
         }
 
-        function resetGame() {
-            showDialog(
-                'Sıfırla',
-                'Sayfayı tamamen yenilemek ve oyunu sıfırlamak istiyor musunuz?',
-                () => {
-                    localStorage.removeItem('okeyGameState');
-                    window.location.reload();
-                },
-                'danger'
-            );
-        }
-
-        function goHome() {
-            if (gameState.gameActive) {
-                showDialog(
-                    'Ana Menü',
-                    'Ana menüye dönmek istiyor musunuz? Mevcut oyun verileri silinecek.',
-                    () => {
-                        localStorage.removeItem('okeyGameState');
-                        window.location.href = 'index.html';
-                    },
-                    'danger'
-                );
-            } else {
-                window.location.href = 'index.html';
-            }
-        }
-
-        function updateStatus() {
-            if (gameState.gameActive) {
-                document.getElementById('status').textContent = `${gameState.startNumber} sayıdan - ${gameState.history.length} el`;
-            } else {
-                document.getElementById('status').textContent = 'Oyun Kurulumu';
-            }
-        }
-
+        function resetGame() { showDialog('Sıfırla', 'Sayfayı tamamen yenilemek ve oyunu sıfırlamak istiyor musunuz?', () => { localStorage.removeItem('okeyGameState'); window.location.reload(); }, 'danger'); }
+        function goHome() { if (gameState.gameActive) { showDialog('Ana Menü', 'Ana menüye dönmek istiyor musunuz? Mevcut oyun verileri silinecek.', () => { localStorage.removeItem('okeyGameState'); window.location.href = 'index.html'; }, 'danger'); } else { window.location.href = 'index.html'; } }
+        function updateStatus() { if (gameState.gameActive) { document.getElementById('status').textContent = `${gameState.startNumber} sayıdan - ${gameState.history.length} el`; } else { document.getElementById('status').textContent = 'Oyun Kurulumu'; } }
+        
         function showDialog(title, message, onConfirm = null, type = 'confirm') {
             document.getElementById('dialogTitle').textContent = title;
             document.getElementById('dialogMessage').textContent = message;
-            
             const actionsDiv = document.getElementById('dialogActions');
             actionsDiv.innerHTML = '';
-
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'dialog-btn dialog-btn-cancel';
             cancelBtn.textContent = onConfirm ? 'Vazgeç' : 'Tamam';
             cancelBtn.onclick = closeDialog;
             actionsDiv.appendChild(cancelBtn);
-
             if (onConfirm) {
                 const confirmBtn = document.createElement('button');
                 confirmBtn.className = type === 'danger' ? 'dialog-btn dialog-btn-danger' : 'dialog-btn dialog-btn-confirm';
                 confirmBtn.textContent = 'Evet';
-                
-                confirmBtn.onclick = () => {
-                    onConfirm();
-                    closeDialog();
-                };
-                
+                confirmBtn.onclick = () => { onConfirm(); closeDialog(); };
                 actionsDiv.appendChild(confirmBtn);
             }
-
             document.getElementById('customDialog').classList.add('active');
         }
-
-        function closeDialog() {
-            document.getElementById('customDialog').classList.remove('active');
-        }
+        function closeDialog() { document.getElementById('customDialog').classList.remove('active'); }
     </script>
 </body>
 </html>
