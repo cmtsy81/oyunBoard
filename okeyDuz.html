@@ -79,9 +79,31 @@
         .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
 
-        .btn-toggle { padding: 10px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; color: #333; width: 100%; }
+        .btn-toggle { 
+            padding: 10px 2px; /* Yan boşlukları azalttık */
+            border: 2px solid #ddd; 
+            background: white; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: #333; 
+            width: 100%;
+            
+            /* YENİ: Yazıyı tek satıra zorla ve sığmazsa küçült */
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Küçük ekranlar için fontu biraz daha küçült */
+        @media (max-width: 380px) {
+            .btn-toggle { font-size: 10px; }
+        }
+
         .btn-toggle.selected { background: #667eea; color: white; border-color: #667eea; }
         .btn-toggle.finish-selected { background: #4caf50; color: white; border-color: #4caf50; }
+        
         .confirm-btn { width: 100%; padding: 14px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
         .confirm-btn:disabled { background: #ccc; cursor: not-allowed; }
 
@@ -116,49 +138,18 @@
         .modal-save { flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .modal-cancel { flex: 1; padding: 12px; background: #e0e0e0; color: #333; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
-        /* --- YENİ ÖZEL DIALOG STİLLERİ --- */
-        .custom-dialog {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeIn 0.2s ease-out;
-        }
+        /* DIALOG */
+        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease-out; }
         .custom-dialog.active { display: flex; }
-        .dialog-box {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+        .dialog-box { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .dialog-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #333; }
         .dialog-message { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.5; }
         .dialog-actions { display: flex; gap: 10px; }
-        .dialog-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .dialog-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; }
         .dialog-btn-cancel { background: #f0f0f0; color: #333; }
         .dialog-btn-confirm { background: #667eea; color: white; }
         .dialog-btn-danger { background: #f44336; color: white; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        /* ---------------------------------- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* FOOTER */
         .footer-version {
@@ -232,7 +223,7 @@
             </div>
         </div>
 
-        <div class="footer-version" id="footerVersion">v1.0</div>
+        <div class="footer-version" id="footerVersion">v1.1.0</div>
     </div>
 
     <div class="modal" id="editModal">
@@ -257,13 +248,12 @@
         <div class="dialog-box">
             <div class="dialog-title" id="dialogTitle">Başlık</div>
             <div class="dialog-message" id="dialogMessage">Mesaj</div>
-            <div class="dialog-actions" id="dialogActions">
-                </div>
+            <div class="dialog-actions" id="dialogActions"></div>
         </div>
     </div>
 
     <script>
-        const APP_VERSION = '1.2';
+        const APP_VERSION = '1.1.0'; 
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
         let gameState = {
@@ -271,7 +261,7 @@
             teamMode: false,
             startNumber: 20,
             scores: [],
-            playerNames: ['K', 'G', 'D', 'B'],
+            playerNames: [], // Dinamik olacak
             selectedWinner: null,
             selectedFinish: null,
             gameActive: false,
@@ -279,50 +269,10 @@
         };
 
         let editingRoundIndex = null;
-        let activeDialogCallback = null; // Dialog "Evet" butonu için geçici fonksiyon
 
         window.onload = function() {
             loadState();
         }
-
-        // --- YENİ DIALOG SİSTEMİ ---
-        function showDialog(title, message, onConfirm = null, type = 'confirm') {
-            document.getElementById('dialogTitle').textContent = title;
-            document.getElementById('dialogMessage').textContent = message;
-            
-            const actionsDiv = document.getElementById('dialogActions');
-            actionsDiv.innerHTML = ''; // Önceki butonları temizle
-
-            // İptal / Kapat Butonu
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'dialog-btn dialog-btn-cancel';
-            cancelBtn.textContent = onConfirm ? 'Vazgeç' : 'Tamam';
-            cancelBtn.onclick = closeDialog;
-            actionsDiv.appendChild(cancelBtn);
-
-            // Eğer onay gerektiren bir işlemse "Evet" butonu ekle
-            if (onConfirm) {
-                const confirmBtn = document.createElement('button');
-                // Silme/Sıfırlama işlemleri için kırmızı, diğerleri için mor
-                confirmBtn.className = type === 'danger' ? 'dialog-btn dialog-btn-danger' : 'dialog-btn dialog-btn-confirm';
-                confirmBtn.textContent = 'Evet';
-                
-                // Callback fonksiyonunu ayarla
-                confirmBtn.onclick = () => {
-                    onConfirm();
-                    closeDialog();
-                };
-                
-                actionsDiv.appendChild(confirmBtn);
-            }
-
-            document.getElementById('customDialog').classList.add('active');
-        }
-
-        function closeDialog() {
-            document.getElementById('customDialog').classList.remove('active');
-        }
-        // -----------------------------
 
         function saveState() {
             gameState.version = APP_VERSION;
@@ -338,7 +288,7 @@
                     if (loadedState.version !== APP_VERSION) {
                         console.log("Eski versiyon tespit edildi. Veriler temizleniyor...");
                         localStorage.removeItem('okeyGameState');
-                        return;
+                        return; 
                     }
 
                     gameState = loadedState;
@@ -356,7 +306,7 @@
                         updateStatus();
                     }
                 } catch (e) {
-                    console.error("Kayıt bozuk.");
+                    console.error("Kayıt dosyası bozuk, sıfırlanıyor.");
                     localStorage.removeItem('okeyGameState');
                 }
             }
@@ -364,17 +314,23 @@
 
         function startGame() {
             const teamMode = document.getElementById('teamMode').value === 'true';
-            const val = document.getElementById('startNumber').value;
-            const startNumber = parseInt(val);
+            const startNumber = parseInt(document.getElementById('startNumber').value);
 
-            if (!val || startNumber < 1) {
-                // Alert yerine yeni dialog
+            if (startNumber < 1) {
                 showDialog('Hata', 'Lütfen geçerli bir sayı girin', null, 'normal');
                 return;
             }
 
             gameState.teamMode = teamMode;
             gameState.startNumber = startNumber;
+            
+            // YENİ İSİMLENDİRME MANTIĞI
+            if (teamMode) {
+                gameState.playerNames = ['Biz', 'Rakip'];
+            } else {
+                gameState.playerNames = ['Ben', 'Sol', 'Karşı', 'Sağ'];
+            }
+
             gameState.scores = Array(teamMode ? 2 : 4).fill(startNumber);
             gameState.selectedWinner = null;
             gameState.selectedFinish = null;
@@ -510,7 +466,6 @@
         }
 
         function deleteRound(idx) {
-            // Confirm yerine Dialog
             showDialog(
                 'Eli Sil', 
                 'Bu eli silmek istediğinize emin misiniz? Puanlar geri alınacak.', 
@@ -529,7 +484,7 @@
                     updateStatus();
                     saveState();
                 },
-                'danger' // Kırmızı buton
+                'danger'
             );
         }
 
@@ -618,7 +573,7 @@
 
         function endGame(loserIndex) {
             const winnerName = gameState.teamMode ? 
-                (loserIndex === 0 ? 'Takım 2 (D-B)' : 'Takım 1 (K-G)') :
+                (loserIndex === 0 ? 'Takım 2 (Rakip)' : 'Takım 1 (Biz)') :
                 gameState.playerNames[loserIndex];
             
             document.getElementById('gameOverMessage').textContent = `🎉 Oyun Bitti!\n${winnerName} kaybetti!`;
@@ -661,6 +616,40 @@
             } else {
                 document.getElementById('status').textContent = 'Oyun Kurulumu';
             }
+        }
+
+        // --- YENİ DIALOG SİSTEMİ ---
+        function showDialog(title, message, onConfirm = null, type = 'confirm') {
+            document.getElementById('dialogTitle').textContent = title;
+            document.getElementById('dialogMessage').textContent = message;
+            
+            const actionsDiv = document.getElementById('dialogActions');
+            actionsDiv.innerHTML = '';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'dialog-btn dialog-btn-cancel';
+            cancelBtn.textContent = onConfirm ? 'Vazgeç' : 'Tamam';
+            cancelBtn.onclick = closeDialog;
+            actionsDiv.appendChild(cancelBtn);
+
+            if (onConfirm) {
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = type === 'danger' ? 'dialog-btn dialog-btn-danger' : 'dialog-btn dialog-btn-confirm';
+                confirmBtn.textContent = 'Evet';
+                
+                confirmBtn.onclick = () => {
+                    onConfirm();
+                    closeDialog();
+                };
+                
+                actionsDiv.appendChild(confirmBtn);
+            }
+
+            document.getElementById('customDialog').classList.add('active');
+        }
+
+        function closeDialog() {
+            document.getElementById('customDialog').classList.remove('active');
         }
     </script>
 </body>
