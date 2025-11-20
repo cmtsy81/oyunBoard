@@ -156,8 +156,20 @@
             flex: 1;
         }
 
+        .button-group.four {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .button-group.three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
         .btn-toggle {
-            padding: 10px 8px;
+            padding: 10px;
             border: 2px solid #ddd;
             background: white;
             border-radius: 6px;
@@ -431,12 +443,12 @@
 
                 <div class="controls-row">
                     <div class="controls-label">Kim bitti?</div>
-                    <div class="button-group" id="winnerSelect"></div>
+                    <div class="button-group four" id="winnerSelect"></div>
                 </div>
 
                 <div class="controls-row">
                     <div class="controls-label">Nasıl bitti?</div>
-                    <div class="button-group">
+                    <div class="button-group three">
                         <button class="btn-toggle" onclick="selectFinish('normal', this)">Normal (2)</button>
                         <button class="btn-toggle" onclick="selectFinish('okey', this)">Okey (4)</button>
                         <button class="btn-toggle" onclick="selectFinish('double', this)">Katlamalı (8)</button>
