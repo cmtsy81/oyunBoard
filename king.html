@@ -24,7 +24,8 @@
         }
         .header h1 { font-size: 20px; font-weight: 800; margin-bottom: 2px; margin: 0; }
         .header-right { display: flex; gap: 15px; }
-        .btn-icon { background: none; border: none; color: #2c3e50; font-size: 22px; cursor: pointer; padding: 0; }
+        .btn-icon { background: none; border: none; color: #2c3e50; font-size: 32px; cursor: pointer; padding: 0; transition: transform 0.2s; }
+        .btn-icon:active { transform: scale(0.9); }
 
         .content { flex: 1; padding: 16px; overflow-y: auto; }
 
@@ -99,20 +100,24 @@
         .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         .input-name { font-weight: 600; font-size: 12px; width: 60px; text-align: left; color: #2c3e50; }
         .input-controls { display: flex; align-items: center; gap: 8px; }
-        .btn-math { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ddd; background: white; font-weight: bold; cursor: pointer; color: #2c3e50; }
+        .btn-math { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: white; font-weight: bold; cursor: pointer; color: #2c3e50; }
         .val-box { font-size: 16px; font-weight: bold; width: 24px; text-align: center; color: #2c3e50; }
         
         .check-bar { text-align: center; margin: 10px 0; font-size: 11px; font-weight: bold; color: #95a5a6; }
         .check-bar.ok { color: #27ae60; }
         .check-bar.err { color: #e74c3c; }
         
-        .btn-save { width: 100%; padding: 10px; background: #27ae60; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
-        .btn-save:disabled { background: #bdc3c7; cursor: not-allowed; }
+        /* MODAL ACTION BUTTONS */
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-modal-action { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; transition: all 0.3s; }
+        .btn-gray { background: #ecf0f1; color: #2c3e50; }
+        .btn-orange { background: #f39c12; color: white; }
+        .btn-orange:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; color: white; }
 
-        /* HISTORY (Düzeltilmiş) */
+        /* HISTORY */
         .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
         .h-item { background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 6px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #f39c12; }
-        .btn-small { padding: 4px 8px; border-radius: 4px; border: none; color: white; font-size: 10px; cursor: pointer; margin-left: 4px; }
+        .btn-small { padding: 6px 12px; border-radius: 4px; border: none; color: white; font-size: 11px; cursor: pointer; font-weight: 600; margin-left: 4px; }
         .btn-edit { background: #3498db; } .btn-del { background: #e74c3c; }
 
         /* TABLE SHEET STYLES */
@@ -127,12 +132,16 @@
         /* DIALOG */
         .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
         .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 20px; border-radius: 12px; width: 80%; max-width: 300px; text-align: center; }
-        .d-btn { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .d-confirm { background: #f39c12; color: white; }
-        .d-cancel { background: #eee; color: #333; margin-right: 10px; }
+        .dialog-box { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; }
+        .d-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .d-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .d-confirm { background: #e74c3c; color: white; }
+        .d-cancel { background: #27ae60; color: white; }
+        .d-danger { background: #e74c3c; color: white; }
 
         .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
+
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -182,7 +191,7 @@
         <div class="modal-sheet">
             <div style="text-align:center; margin-bottom:15px; font-weight:bold; font-size:16px;"><span id="modalPlayerName" style="color:#f39c12;"></span> Ne Oynuyor?</div>
             <div class="game-grid" id="gameSelectGrid"></div>
-            <button onclick="closeModal('gameSelectModal')" style="width:100%; padding:12px; margin-top:15px; border:none; background:#eee; border-radius:8px;">Vazgeç</button>
+            <button onclick="closeModal('gameSelectModal')" style="width:100%; padding:12px; margin-top:15px; border:none; background:#e74c3c; color:white; border-radius:8px; font-weight:bold;">Vazgeç</button>
         </div>
     </div>
 
@@ -194,9 +203,9 @@
                 <div id="inputRows"></div>
                 <div class="check-bar" id="inputTotalCheck"></div>
             </div>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="d-btn d-cancel" onclick="closeModal('inputModal')">İptal</button>
-                <button class="d-btn d-confirm" id="btnInputSave" onclick="saveRound()">KAYDET</button>
+            <div class="modal-actions">
+                <button class="btn-modal-action btn-gray" onclick="closeModal('inputModal')">İptal</button>
+                <button class="btn-modal-action btn-orange" id="btnInputSave" onclick="saveRound()" disabled>KAYDET</button>
             </div>
         </div>
     </div>
@@ -209,9 +218,9 @@
                 <div id="editPlayerInputs"></div>
                 <div class="check-bar" id="editTotalCheck"></div>
             </div>
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="d-btn d-cancel" onclick="closeModal('editModal')">İptal</button>
-                <button class="d-btn d-confirm" id="btnEditSave" onclick="saveEditRound()">Kaydet</button>
+            <div class="modal-actions">
+                <button class="btn-modal-action btn-gray" onclick="closeModal('editModal')">İptal</button>
+                <button class="btn-modal-action btn-orange" id="btnEditSave" onclick="saveEditRound()">GÜNCELLE</button>
             </div>
         </div>
     </div>
@@ -228,7 +237,7 @@
         <div class="dialog-box">
             <h3 id="dTitle" style="margin:0 0 10px 0;"></h3>
             <p id="dMsg" style="color:#666; font-size:14px;"></p>
-            <div id="dActions"></div>
+            <div id="dActions" class="d-actions"></div>
         </div>
     </div>
 
@@ -385,9 +394,11 @@
             
             bar.textContent = `Toplam: ${total} / ${rule.target}`;
             if(total === rule.target) {
-                bar.className = 'check-bar ok'; btn.disabled = false;
+                bar.className = 'check-bar ok'; 
+                btn.disabled = false;
             } else {
-                bar.className = 'check-bar err'; btn.disabled = true;
+                bar.className = 'check-bar err'; 
+                btn.disabled = true;
             }
         }
 
@@ -454,7 +465,6 @@
             }, "danger");
         }
 
-        // --- TABLO (SHEET) ---
         function openSheetModal() {
             const totals = {};
             const grandTotal = [0,0,0,0];
@@ -551,15 +561,14 @@
                     if(p.version === APP_VERSION) { gameState = p; updateUI(); } 
                 } catch(e){} 
             } else {
-                // VERİ KURTARMA: Eski v1.3 (v13) verisi varsa al ve güncelle
                 const old = localStorage.getItem('kingGamev13');
                 if(old) {
                     try {
                         const p = JSON.parse(old);
                         gameState = p;
-                        gameState.version = APP_VERSION; // Versiyonu yükselt
+                        gameState.version = APP_VERSION;
                         updateUI();
-                        saveState(); // Yeni versiyonla kaydet
+                        saveState();
                     } catch(e) {}
                 }
             }
