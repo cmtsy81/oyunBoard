@@ -15,9 +15,10 @@
             color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10;
         }
-        .header h1 { font-size: 20px; font-weight: 800; margin: 0; }
-        .header .status { font-size: 12px; opacity: 0.9; font-weight: 600; }
-        .btn-icon { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; }
+        .header h1 { font-size: 22px; font-weight: 800; margin: 0; }
+        .header-right { display: flex; gap: 20px; align-items: center; }
+        .btn-icon { background: none; border: none; color: white; font-size: 32px; cursor: pointer; padding: 5px; line-height: 1; display: flex; align-items: center; }
+        .btn-icon:active { transform: scale(0.9); opacity: 0.8; }
 
         .content { flex: 1; padding: 16px; overflow-y: auto; }
 
@@ -36,10 +37,10 @@
         .pos-center { grid-column: 2; grid-row: 2; min-height: 100px; display: flex; align-items: center; justify-content: center; z-index: 5; }
 
         .setup-input-wrapper { text-align: center; }
-        .setup-label { font-size: 11px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
-        .player-name-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; }
+        .setup-label { font-size: 12px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
+        .player-name-input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; font-size: 16px;}
         
-        .btn-start { width: 100%; padding: 14px; background: #ee5253; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+        .btn-start { width: 100%; padding: 16px; background: #ee5253; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(238, 82, 83, 0.3); }
 
         /* SCOREBOARD */
         .scoreboard { display: none; }
@@ -61,10 +62,10 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* MODAL */
+        /* MODAL & INPUTS */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
         .modal.active { display: flex; }
-        .modal-sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+        .modal-sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
 
         .finish-types { display: flex; gap: 10px; margin-bottom: 20px; }
         .f-btn { flex: 1; padding: 12px; border: 2px solid #eee; background: white; border-radius: 8px; font-weight: bold; color: #555; cursor: pointer; }
@@ -77,8 +78,14 @@
         .btn-101 { padding: 0 12px; background: #fff0f0; color: #ee5253; border: 1px solid #ffcccc; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; white-space: nowrap; }
         .btn-101:active { background: #ee5253; color: white; }
 
-        .btn-save-modal { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; transition: background 0.3s; }
-        .btn-save-modal:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
+        /* BUTONLAR */
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-modal-action { flex: 1; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; transition: background 0.3s; }
+        
+        .btn-gray { background: #ecf0f1; color: #2c3e50; }
+        .btn-green { background: #27ae60; color: white; }
+
+        .btn-green:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; color: white; }
 
         /* HISTORY */
         .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
@@ -92,13 +99,33 @@
         .btn-edit { background: #2196F3; }
         .btn-del { background: #f44336; }
 
-        /* DIALOG */
+        /* TABLE SHEET */
+        .score-table-container { overflow-x: auto; margin-bottom: 20px; }
+        .score-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+        .score-table th { background: #ee5253; color: white; padding: 8px 2px; font-weight: bold; }
+        .score-table td { border-bottom: 1px solid #eee; padding: 6px 2px; color: #2c3e50; }
+        .score-table tr:nth-child(even) { background: #f9f9f9; }
+        .score-table .total-row { font-weight: bold; background: #ecf0f1 !important; color: #d35400; }
+        .score-table .game-col { text-align: left; padding-left: 5px; font-weight: 600; }
+
+        /* DIALOG (YENİ TASARIM) */
         .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
         .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 20px; border-radius: 12px; width: 80%; max-width: 300px; text-align: center; }
-        .d-btn { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .dialog-box { background: white; padding: 24px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .dialog-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #2c3e50; }
+        .dialog-message { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.5; }
+        
+        /* Dialog Butonları Eşit ve Geniş */
+        .dialog-actions { display: flex; gap: 10px; width: 100%; }
+        .dialog-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.3s; }
+        
+        /* Vazgeç (Yeşil - Güvenli) */
+        .d-cancel { background: #27ae60; color: white; }
+        .d-cancel:active { background: #219150; }
+        
+        /* Onayla (Kırmızı - Riskli) */
         .d-confirm { background: #ee5253; color: white; }
-        .d-cancel { background: #eee; color: #333; margin-right: 10px; }
+        .d-confirm:active { background: #e63b3b; }
 
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
@@ -108,8 +135,11 @@
     <div class="container">
         <div class="header">
             <button class="btn-icon" onclick="goHome()">🏠</button>
-            <div class="header-center"><h1>101 Okey</h1><div class="status" id="status">Kurulum</div></div>
-            <button class="btn-icon" onclick="resetGame()">🔄</button>
+            <h1>101 Okey</h1>
+            <div class="header-right">
+                <button class="btn-icon" onclick="openSheetModal()" title="Puan Tablosu">📊</button>
+                <button class="btn-icon" onclick="resetGame()" title="Sıfırla">🔄</button>
+            </div>
         </div>
 
         <div class="content">
@@ -140,7 +170,7 @@
                 </div>
             </div>
         </div>
-        <div class="footer-version" id="footerVersion">v1.3.7</div>
+        <div class="footer-version" id="footerVersion">v1.4.3</div>
     </div>
 
     <div class="modal" id="inputModal">
@@ -161,8 +191,10 @@
                 * Girilen puanlar (ve açmadı cezası) x2 yapılacaktır.
             </div>
 
-            <button id="btnModalSave" class="btn-save-modal" onclick="submitRound()" disabled>KAYDET</button>
-            <button onclick="closeModal()" style="width:100%; padding:12px; margin-top:10px; border:none; background:#eee; border-radius:8px;">İptal</button>
+            <div class="modal-actions">
+                <button class="btn-modal-action btn-gray" onclick="closeModal()">İptal</button>
+                <button class="btn-modal-action btn-green" id="btnModalSave" onclick="submitRound()" disabled>KAYDET</button>
+            </div>
         </div>
     </div>
 
@@ -178,21 +210,33 @@
 
             <div id="editModalInputs"></div>
 
-            <button id="btnEditSave" class="btn-save-modal" onclick="saveEditRound()">GÜNCELLE</button>
-            <button onclick="closeEditModal()" style="width:100%; padding:12px; margin-top:10px; border:none; background:#eee; border-radius:8px;">İptal</button>
+            <div class="modal-actions">
+                <button class="btn-modal-action btn-gray" onclick="closeEditModal()">İptal</button>
+                <button class="btn-modal-action btn-green" id="btnEditSave" onclick="saveEditRound()">GÜNCELLE</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="sheetModal">
+        <div class="modal-sheet">
+            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:10px; color:#2c3e50;">Puan Tablosu</div>
+            <div id="sheetContent" style="flex:1; overflow:auto;"></div>
+            <div class="modal-actions">
+                <button onclick="closeSheetModal()" class="btn-modal-action btn-green">Kapat</button>
+            </div>
         </div>
     </div>
 
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <h3 id="dTitle" style="margin:0 0 10px 0;"></h3>
-            <p id="dMsg" style="color:#666; font-size:14px;"></p>
-            <div id="dActions" style="display:flex; gap:10px; margin-top:15px;"></div>
+            <h3 id="dTitle" class="dialog-title"></h3>
+            <p id="dMsg" class="dialog-message"></p>
+            <div id="dActions" class="dialog-actions"></div>
         </div>
     </div>
 
     <script>
-        const APP_VERSION = '1.3.7';
+        const APP_VERSION = '1.4.3';
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
         const POSITIONS = ['pos-bottom', 'pos-right', 'pos-top', 'pos-left'];
@@ -380,6 +424,33 @@
             }, "danger");
         }
 
+        // --- SHEET ---
+        function openSheetModal() {
+            const totals = [0,0,0,0];
+            const wName = gameState.playerNames;
+            
+            let html = `<table class="score-table"><thead><tr><th>EL</th>`;
+            wName.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
+            html += `</tr></thead><tbody>`;
+
+            gameState.history.forEach((h, idx) => {
+                html += `<tr><td>${idx+1}</td>`;
+                h.changes.forEach((val, i) => {
+                    totals[i] += val;
+                    html += `<td>${val}</td>`;
+                });
+                html += `</tr>`;
+            });
+
+            html += `<tr class="total-row"><td>TOP</td>`;
+            totals.forEach(t => html += `<td>${t}</td>`);
+            html += `</tr></tbody></table>`;
+
+            document.getElementById('sheetContent').innerHTML = html;
+            document.getElementById('sheetModal').classList.add('active');
+        }
+        function closeSheetModal() { document.getElementById('sheetModal').classList.remove('active'); }
+
         function updateUI() {
             if(!gameState.gameActive) {
                 document.getElementById('setupSection').classList.add('active');
@@ -412,7 +483,7 @@
 
                 let delBtn = '';
                 if(realIdx === gameState.history.length - 1) {
-                    delBtn = `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>`;
+                    delBtn = `<div class="h-actions"><button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button></div>`;
                 }
 
                 hList.innerHTML += `
@@ -422,7 +493,9 @@
                                 <span>${realIdx + 1}. El - ${wName}</span>
                                 <span style="font-size:10px; color:#666;"> - ${typeText}</span>
                             </div>
-                            <div class="h-details">Kazanan: ${h.changes[h.winner]}<br>${details}</div>
+                            <div class="h-details">
+                                Kazanan: ${h.changes[h.winner]}<br>${details}
+                            </div>
                         </div>
                         <div class="h-actions">
                             <button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>
@@ -433,9 +506,16 @@
             });
         }
 
-        function saveState() { localStorage.setItem('okey101Statev13', JSON.stringify(gameState)); }
-        function loadState() { const s = localStorage.getItem('okey101Statev13'); if(s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} } }
-        function resetGame() { showDialog("Sıfırla", "Her şey silinsin mi?", (y)=>{ if(y){ localStorage.removeItem('okey101Statev13'); window.location.reload(); } }, "danger"); }
+        function saveState() { localStorage.setItem('okey101Statev14', JSON.stringify(gameState)); }
+        function loadState() { 
+            const s = localStorage.getItem('okey101Statev14'); 
+            if(s) { 
+                try { gameState = JSON.parse(s); updateUI(); } catch(e){} 
+            } else {
+                localStorage.removeItem('okey101Statev13'); // Clean old
+            }
+        }
+        function resetGame() { showDialog("Sıfırla", "Her şey silinsin mi?", (y)=>{ if(y){ localStorage.removeItem('okey101Statev14'); window.location.reload(); } }, "danger"); }
         function goHome() { if(gameState.gameActive) showDialog("Çıkış", "Menüye dön?", (y)=>{if(y) window.location.href='index.html';}, "normal"); else window.location.href='index.html'; }
 
         function showDialog(title, msg, callback, type) {
@@ -444,8 +524,22 @@
             document.getElementById('dMsg').textContent = msg;
             const act = document.getElementById('dActions');
             act.innerHTML = '';
-            const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç"; b1.onclick = () => { box.classList.remove('active'); callback(false); };
-            const b2 = document.createElement('button'); b2.className = 'd-btn ' + (type === 'danger' ? 'd-danger' : 'd-confirm'); b2.textContent = "Onayla"; b2.onclick = () => { box.classList.remove('active'); callback(true); };
+            
+            const b1 = document.createElement('button'); 
+            b1.className = 'dialog-btn d-cancel'; // Yeşil Vazgeç
+            b1.textContent = "Vazgeç"; 
+            b1.onclick = () => { box.classList.remove('active'); callback(false); };
+            
+            const b2 = document.createElement('button'); 
+            
+            // Eğer 'danger' (Silme/Sıfırlama) ise Kırmızı Onayla
+            // Eğer 'normal' (Çıkış) ise yine Kırmızı Onayla (Çıkış işlemi)
+            // Tasarımda Onayla butonu her zaman kırmızı istenmişti (Riskli işlem gibi)
+            b2.className = 'dialog-btn d-confirm'; // Kırmızı Onayla (CSS'de tanımlı)
+            
+            b2.textContent = "Onayla"; 
+            b2.onclick = () => { box.classList.remove('active'); callback(true); };
+            
             act.appendChild(b1); act.appendChild(b2);
             box.classList.add('active');
         }

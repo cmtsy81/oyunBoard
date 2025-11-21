@@ -37,6 +37,7 @@
         .menu-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; }
         
         /* Renk Şeritleri */
+        .card-batak::before { background: linear-gradient(to bottom, #34495e, #2c3e50); }
         .card-okey-duz::before { background: linear-gradient(to bottom, #667eea, #764ba2); }
         .card-okey-101::before { background: linear-gradient(to bottom, #ff6b6b, #ee5253); }
         .card-king::before { background: linear-gradient(to bottom, #f1c40f, #f39c12); }
@@ -64,24 +65,29 @@
             <p>Oyun Skor Takip & Araçlar</p>
         </div>
 
-        <div class="menu-grid">
+        <div class="menu-grid" id="menuGrid">
             
-            <a href="okeyDuz.html" class="menu-card card-okey-duz">
-                <div class="card-img-container"><img src="img/okey.png" alt="Okey" class="card-img" onerror="this.src='https://placehold.co/60x60/667eea/white?text=OKEY'"></div>
-                <div class="card-content"><h3>Düz Okey</h3><p>Düşmeli skor takibi</p></div>
+            <a href="batak.html" class="menu-card card-batak" data-id="batak">
+                <div class="card-img-container"><img src="img/batak.png" alt="Batak" class="card-img" onerror="this.src='https://placehold.co/60x60/2c3e50/white?text=BATAK'"></div>
+                <div class="card-content"><h3>Batak</h3><p>İhaleli, Eşli, Gömmeli...</p></div>
             </a>
 
-            <a href="okey101.html" class="menu-card card-okey-101">
+            <a href="okey101.html" class="menu-card card-okey-101" data-id="101">
                 <div class="card-img-container"><img src="img/101.png" alt="101" class="card-img" onerror="this.src='https://placehold.co/60x60/ff6b6b/white?text=101'"></div>
                 <div class="card-content"><h3>101 Okey</h3><p>Katlamalı hesaplama</p></div>
             </a>
 
-            <a href="king.html" class="menu-card card-king">
+            <a href="okeyDuz.html" class="menu-card card-okey-duz" data-id="okey">
+                <div class="card-img-container"><img src="img/okey.png" alt="Okey" class="card-img" onerror="this.src='https://placehold.co/60x60/667eea/white?text=OKEY'"></div>
+                <div class="card-content"><h3>Düz Okey</h3><p>Düşmeli skor takibi</p></div>
+            </a>
+
+            <a href="king.html" class="menu-card card-king" data-id="king">
                 <div class="card-img-container"><img src="img/king.png" alt="King" class="card-img" onerror="this.src='https://placehold.co/60x60/f1c40f/white?text=KING'"></div>
                 <div class="card-content"><h3>King</h3><p>Rıfkı, Kız, Koz...</p></div>
             </a>
 
-            <a href="zarAt.html" class="menu-card card-zar">
+            <a href="zarAt.html" class="menu-card card-zar" data-id="zar">
                 <div class="card-img-container"><img src="img/zar.png" alt="Zar" class="card-img" onerror="this.src='https://placehold.co/60x60/00b894/white?text=ZAR'"></div>
                 <div class="card-content"><h3>Zar At</h3><p>3D Zar Simülasyonu</p></div>
             </a> 
@@ -89,38 +95,69 @@
         </div>
 
         <div class="version" id="footerVersion">
-            v1.4.2
+            v1.5.0
         </div>
     </div>
 
     <script>
-        // --- VERSİYON KONTROLÜ ---
-        const APP_VERSION = '1.4.2'; // Burayı değiştirdiğinde herkesin sayfası yenilenir
-        
+        const APP_VERSION = '1.5.0';
         document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
 
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
         window.onload = function() {
-            const savedVersion = localStorage.getItem('menuVersion');
-            
-            // Eğer kayıtlı versiyon ile şu anki kodun versiyonu farklıysa
-            if (savedVersion !== APP_VERSION) {
-                console.log('Yeni versiyon algılandı. Cache temizleniyor...');
-                
-                // Yeni versiyonu kaydet
-                localStorage.setItem('menuVersion', APP_VERSION);
-                
-                // Sayfayı sunucudan taze çekerek yenile (Hard Reload)
-                // Not: Sonsuz döngüye girmemesi için kontrol ediyoruz, 
-                // çünkü browser HTML'i cache'den okuduysa APP_VERSION eski kalır.
-                // Ancak biz "Cache-Control" meta etiketlerini de ekledik.
-                // Yine de görsel bir uyarı vermeden sessizce yenilemek en temizidir.
-                // location.reload(true); 
-            }
+            sortMenu(); // Sayfa açılınca sırala
+            checkVersion();
         };
 
-        // --- SES EFEKTİ ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+        // --- AKILLI SIRALAMA ---
+        function sortMenu() {
+            const grid = document.getElementById('menuGrid');
+            const cards = Array.from(grid.children);
+            
+            // Kayıtlı zamanları al
+            const usageData = JSON.parse(localStorage.getItem('gameUsage')) || {};
+
+            // Sıralama Fonksiyonu
+            cards.sort((a, b) => {
+                const idA = a.getAttribute('data-id');
+                const idB = b.getAttribute('data-id');
+                
+                // Zaman damgasını al (yoksa 0)
+                const timeA = usageData[idA] || 0;
+                const timeB = usageData[idB] || 0;
+
+                // Büyükten küçüğe (En son oynanan en üste)
+                return timeB - timeA; 
+            });
+
+            // Yeni sırayı uygula
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        function saveUsage(gameId) {
+            const usageData = JSON.parse(localStorage.getItem('gameUsage')) || {};
+            usageData[gameId] = Date.now(); // Şu anki zamanı kaydet
+            localStorage.setItem('gameUsage', JSON.stringify(usageData));
+        }
+
+        // Tıklama Dinleyicisi
+        document.querySelectorAll('.menu-card').forEach(link => { 
+            link.addEventListener('click', function() { 
+                playClick();
+                const id = this.getAttribute('data-id');
+                if(id) saveUsage(id); // Tıklanan oyunu kaydet
+            }); 
+        });
+
+        // --- SİSTEM ---
+        function checkVersion() {
+            const savedVersion = localStorage.getItem('menuVersion');
+            if (savedVersion !== APP_VERSION) {
+                localStorage.setItem('menuVersion', APP_VERSION);
+            }
+        }
+
         function playClick() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -133,8 +170,6 @@
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
             osc.start(); osc.stop(audioCtx.currentTime + 0.05);
         }
-
-        document.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => playClick()); });
     </script>
 </body>
 </html>
