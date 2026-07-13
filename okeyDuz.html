@@ -4,144 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Okey Skor</title>
+    <link rel="stylesheet" href="common.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding-bottom: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        /* ── DÜZ OKEY RENK TOKENları ──────────────── */
+        :root { --accent: #667eea; --accent2: #764ba2; }
+        .header      { background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); }
+        .btn-start   { background: var(--accent); box-shadow: 0 4px 10px rgba(102,126,234,0.3); }
+        .score-table th { background: var(--accent); }
+        .h-item      { border-left-color: var(--accent); }
+        .p-score     { font-size: 24px; font-weight: 800; color: var(--accent); }
+        .player-card:active { background: #f0f2ff; border-color: var(--accent); }
 
-        /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10;
-        }
-        .header h1 { font-size: 22px; margin: 0; font-weight: 800; }
-        .header-right { display: flex; gap: 20px; align-items: center; }
-        .btn-icon { 
-            background: none; border: none; color: white; 
-            font-size: 32px; cursor: pointer; padding: 5px; line-height: 1; display: flex; align-items: center; 
-        }
-        .btn-icon:active { transform: scale(0.9); opacity: 0.8; }
-
-        .content { flex: 1; padding: 16px; overflow-y: auto; }
-
-        /* SETUP - GÜNCELLENDİ */
-        .setup-section { display: none; } .setup-section.active { display: block; }
-        
-        .setup-label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: #555; }
-
-        /* Buton Grupları */
-        .btn-group-row { display: flex; gap: 8px; margin-bottom: 20px; }
-        
-        .setup-btn {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 8px;
-            font-weight: 600;
-            color: #555;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        
-        .setup-btn.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
-        }
-
-        /* MASA DÜZENİ (ESKİSİ GİBİ KALDI) */
-        .table-layout {
-            display: grid; grid-template-columns: 1fr 1.2fr 1fr; grid-template-rows: auto auto auto;
-            gap: 10px; margin-bottom: 20px; align-items: center;
-        }
-        .pos-top { grid-column: 2; grid-row: 1; }
-        .pos-left { grid-column: 1; grid-row: 2; }
-        .pos-right { grid-column: 3; grid-row: 2; }
-        .pos-bottom { grid-column: 2; grid-row: 3; }
-        .pos-center { grid-column: 2; grid-row: 2; min-height: 100px; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        .setup-input-wrapper { text-align: center; }
-        .setup-label-pos { font-size: 11px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
-        .player-name-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; font-size: 16px;}
-        
-        .btn-start { width: 100%; padding: 16px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); }
-
-        /* SCOREBOARD */
-        .scoreboard { display: none; } .scoreboard.active { display: block; }
-
-        .player-card {
-            background: white; border: 2px solid #eee; border-radius: 12px; padding: 10px;
-            position: relative; transition: all 0.2s; text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 12px; cursor: pointer;
-        }
-        .player-card:active { transform: scale(0.95); background: #f0f2ff; border-color: #667eea; }
-        
-        .team-a { border-left: 4px solid #667eea; }
+        /* ── DÜZ OKEY'E ÖZGÜ ──────────────────────── */
+        .team-a { border-left: 4px solid var(--accent); }
         .team-b { border-left: 4px solid #f093fb; }
-        
-        .p-name { font-weight: bold; color: #2c3e50; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-score { font-size: 24px; font-weight: 800; color: #667eea; }
-        
-        .center-info { 
-            text-align: center; color: #bdc3c7; font-size: 11px; font-weight: bold; line-height: 1.4; 
-            border: 2px dashed #eee; padding: 10px; border-radius: 50%; width: 100px; height: 100px;
+
+        .center-info {
+            text-align: center; color: #bdc3c7; font-size: 11px; font-weight: bold; line-height: 1.4;
+            border: 2px dashed #eee; padding: 10px; border-radius: 50%;
+            width: 100px; height: 100px;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* HISTORY */
-        .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .h-item { 
-            background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #eee;
-            border-left: 4px solid #667eea; font-size: 13px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; 
+        /* Setup butonları (mod & başlangıç sayısı) */
+        .btn-group-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        .setup-btn {
+            flex: 1; padding: 12px; border: 1px solid #ddd; background: white;
+            border-radius: 8px; font-weight: 600; color: #555; cursor: pointer;
+            font-size: 14px; transition: all 0.2s;
         }
-        .history-item-text { flex: 1; }
-        .history-item-buttons { display: flex; gap: 5px; }
-        .btn-small { padding: 6px 12px; font-size: 11px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; color: white; }
-        .btn-edit { background: #2196F3; } .btn-delete { background: #f44336; }
+        .setup-btn.selected { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 5px rgba(102,126,234,0.3); }
+
+        /* Bitiş seçim butonları */
+        .finish-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .f-btn { padding: 15px; border: 2px solid #eee; background: white; border-radius: 10px; font-weight: bold; color: #555; cursor: pointer; }
+        .f-btn.normal  { border-color: var(--accent); color: var(--accent); }
+        .f-btn.okey    { border-color: #d35400; color: #d35400; }
+        .f-btn.katlama { border-color: #e74c3c; color: #e74c3c; }
+
+        /* Oyun bitti banner */
         .game-over { background: #fff3cd; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; display: none; border: 1px solid #ffeeba; }
         .game-over.active { display: block; }
         .game-over h2 { color: #856404; margin-bottom: 10px; font-size: 20px; }
 
-        /* MODALS & DIALOGS */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
-        .modal.active { display: flex; }
-        .modal-content, .modal-sheet { background: white; border-radius: 20px 20px 0 0; padding: 25px 20px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
-        .finish-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .f-btn { padding: 15px; border: 2px solid #eee; background: white; border-radius: 10px; font-weight: bold; color: #555; cursor: pointer; }
-        .f-btn.normal { border-color: #667eea; color: #667eea; }
-        .f-btn.okey { border-color: #d35400; color: #d35400; }
-        .f-btn.katlama { border-color: #e74c3c; color: #e74c3c; }
-
-        .modal-footer { display: flex; gap: 10px; margin-top: 25px; }
-        .modal-action-btn { flex: 1; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; }
-        .btn-modal-cancel { background: #ecf0f1; color: #2c3e50; }
-        .btn-modal-save { background: #667eea; color: white; }
-        .btn-modal-close { background: #27ae60; color: white; }
-        
-        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
-        .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
-        .dialog-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #2c3e50; }
-        .dialog-message { font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5; }
-        .dialog-actions { display: flex; gap: 10px; width: 100%; }
-        .dialog-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
-        .d-cancel { background: #27ae60; color: white; }
-        .d-confirm { background: #e74c3c; color: white; }
-        
-        /* TABLE SHEET */
-        .score-table-container { overflow-x: auto; margin-bottom: 20px; }
-        .score-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .score-table th { background: #667eea; color: white; padding: 8px 2px; font-weight: bold; }
-        .score-table td { border-bottom: 1px solid #eee; padding: 6px 2px; color: #2c3e50; }
-        .score-table tr:nth-child(even) { background: #f9f9f9; }
-        .score-table .total-row { font-weight: bold; background: #ecf0f1 !important; color: #2c3e50; }
-
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
+        /* Edit modal bazı özel stiller */
+        .edit-select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -172,13 +79,12 @@
                 </div>
 
                 <div class="table-layout">
-                    <div class="pos-top setup-input-wrapper"><label class="setup-label-pos">Karşı</label><input type="text" class="player-name-input" id="p2" value="Karşı"></div>
-                    <div class="pos-left setup-input-wrapper"><label class="setup-label-pos">Sol</label><input type="text" class="player-name-input" id="p3" value="Sol"></div>
+                    <div class="pos-top setup-input-wrapper"><label class="setup-label">Karşı</label><input type="text" class="player-name-input" id="p2" value="Karşı"></div>
+                    <div class="pos-left setup-input-wrapper"><label class="setup-label">Sol</label><input type="text" class="player-name-input" id="p3" value="Sol"></div>
                     <div class="pos-center" style="opacity:0.3; font-weight:bold; font-size:12px;">MASA</div>
-                    <div class="pos-right setup-input-wrapper"><label class="setup-label-pos">Sağ</label><input type="text" class="player-name-input" id="p1" value="Sağ"></div>
-                    <div class="pos-bottom setup-input-wrapper"><label class="setup-label-pos">Ben</label><input type="text" class="player-name-input" id="p0" value="Ben"></div>
+                    <div class="pos-right setup-input-wrapper"><label class="setup-label">Sağ</label><input type="text" class="player-name-input" id="p1" value="Sağ"></div>
+                    <div class="pos-bottom setup-input-wrapper"><label class="setup-label">Ben</label><input type="text" class="player-name-input" id="p0" value="Ben"></div>
                 </div>
-                
                 <button class="btn-start" onclick="startGame()">Oyunu Başlat</button>
             </div>
 
@@ -189,14 +95,12 @@
             <div class="scoreboard" id="scoreboard">
                 <div class="table-layout" id="gameTable">
                     <div class="pos-center">
-                        <div class="center-info">
-                            BİTEN OYUNCUNUN<br>KARTINA TIKLA
-                        </div>
+                        <div class="center-info">BİTEN OYUNCUNUN<br>KARTINA TIKLA</div>
                     </div>
                 </div>
 
                 <div class="history-area">
-                    <div style="font-size:12px; font-weight:bold; color:#95a5a6; margin-bottom:5px;">GEÇMİŞ ELLER</div>
+                    <div class="history-label">Geçmiş Eller</div>
                     <div id="historyList"></div>
                 </div>
             </div>
@@ -204,101 +108,85 @@
         <div class="footer-version" id="footerVersion">v1.4.0</div>
     </div>
 
+    <!-- Bitiş Seçim Modal -->
     <div class="modal" id="finishModal">
         <div class="modal-sheet">
             <div style="text-align:center; margin-bottom:10px; font-weight:bold; font-size:16px;">
-                <span id="modalPlayerName" style="color:#667eea;"></span> Bitti
+                <span id="modalPlayerName" style="color:var(--accent);"></span> Bitti
             </div>
             <div style="text-align:center; font-size:13px; color:#666; margin-bottom:15px;">Nasıl bittiğini seçin:</div>
             <div class="finish-options">
-                <button class="f-btn normal" onclick="submitRound('normal')">Normal<br>(2)</button>
-                <button class="f-btn okey" onclick="submitRound('okey')">Okey<br>(4)</button>
+                <button class="f-btn normal"  onclick="submitRound('normal')">Normal<br>(2)</button>
+                <button class="f-btn okey"    onclick="submitRound('okey')">Okey<br>(4)</button>
                 <button class="f-btn katlama" onclick="submitRound('double')">Katlama<br>(8)</button>
             </div>
-            <button onclick="document.getElementById('finishModal').classList.remove('active')" class="modal-action-btn btn-modal-cancel" style="width:100%; margin-top:15px;">Vazgeç</button>
+            <button onclick="closeModal('finishModal')" class="btn-modal-action btn-gray" style="width:100%; margin-top:15px;">Vazgeç</button>
         </div>
     </div>
 
+    <!-- Düzenleme Modal -->
     <div class="modal" id="editModal">
         <div class="modal-sheet">
             <div style="text-align:center; margin-bottom:10px; font-weight:bold;">Eli Düzenle</div>
             <div style="margin-bottom:10px;">
                 <label style="font-size:12px; font-weight:bold;">Biten Kişi:</label>
-                <select id="editWinnerSelect" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px;"></select>
+                <select id="editWinnerSelect" class="edit-select"></select>
             </div>
             <div style="margin-bottom:20px;">
                 <label style="font-size:12px; font-weight:bold;">Bitiş Türü:</label>
                 <div class="finish-options">
                     <button class="f-btn" id="editBtnTypeNormal" onclick="updateEditFinish('normal')">N (2)</button>
-                    <button class="f-btn" id="editBtnTypeOkey" onclick="updateEditFinish('okey')">O (4)</button>
+                    <button class="f-btn" id="editBtnTypeOkey"   onclick="updateEditFinish('okey')">O (4)</button>
                     <button class="f-btn" id="editBtnTypeDouble" onclick="updateEditFinish('double')">K (8)</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="modal-action-btn btn-modal-cancel" onclick="closeEditModal()">İptal</button>
-                <button class="modal-action-btn btn-modal-save" onclick="saveEditRound()">Güncelle</button>
+            <div class="modal-actions">
+                <button class="btn-modal-action btn-gray" onclick="closeEditModal()">İptal</button>
+                <button class="btn-modal-action btn-green" onclick="saveEditRound()">Güncelle</button>
             </div>
         </div>
     </div>
 
+    <!-- Puan Tablosu Modal -->
     <div class="modal" id="sheetModal">
         <div class="modal-sheet">
-            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:10px; color:#2c3e50;">Puan Tablosu</div>
+            <div class="modal-title">Puan Tablosu</div>
             <div id="sheetContent" style="flex:1; overflow:auto;"></div>
-            <div class="modal-footer">
-                <button onclick="closeSheetModal()" class="modal-action-btn btn-modal-close">Kapat</button>
+            <div class="modal-actions">
+                <button onclick="closeModal('sheetModal')" class="btn-modal-action btn-green">Kapat</button>
             </div>
         </div>
     </div>
 
+    <!-- Confirm Dialog -->
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <h3 id="dTitle" class="dialog-title"></h3>
-            <p id="dMsg" class="dialog-message"></p>
-            <div id="dActions" class="dialog-actions"></div>
+            <h3 id="dTitle"></h3>
+            <p id="dMsg"></p>
+            <div id="dActions" class="d-actions"></div>
         </div>
     </div>
 
+    <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.4.0';
-        document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
+        setFooterVersion(APP_VERSION);
 
         const POSITIONS = ['pos-bottom', 'pos-right', 'pos-top', 'pos-left'];
-        
+
         let gameState = {
-            version: APP_VERSION,
-            teamMode: false,
-            startNumber: 20,
-            scores: [],
-            playerNames: [],
-            gameActive: false,
-            history: []
+            version: APP_VERSION, teamMode: false, startNumber: 20,
+            scores: [], playerNames: [], gameActive: false, history: []
         };
 
         let tempWinnerIndex = null;
-        let editState = { index: null, finish: 'normal' };
-
-        // Varsayılan Seçimler
-        let setupState = { teamMode: false, startNumber: 20 };
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playClick() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-        }
-        document.addEventListener('click', e => { if(e.target.closest('button') || e.target.closest('.player-card')) playClick(); });
+        let editState       = { index: null, finish: 'normal' };
+        let setupState      = { teamMode: false, startNumber: 20 };
 
         window.onload = loadState;
 
-        // --- YENİ SETUP FONKSİYONLARI ---
         function setTeamMode(isTeam, btn) {
             setupState.teamMode = isTeam;
-            // Buton görselini güncelle (kardeşleri temizle)
             btn.parentElement.querySelectorAll('.setup-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             toggleTeamInputs(isTeam);
@@ -311,163 +199,118 @@
         }
 
         function toggleTeamInputs(isTeam) {
-            if (isTeam) {
-                document.getElementById('p0').value = "Biz"; document.getElementById('p0').disabled = true;
-                document.getElementById('p2').value = "Biz"; document.getElementById('p2').disabled = true;
-                document.getElementById('p1').value = "Rakip"; document.getElementById('p1').disabled = true;
-                document.getElementById('p3').value = "Rakip"; document.getElementById('p3').disabled = true;
-            } else {
-                document.getElementById('p0').value = "Ben"; document.getElementById('p0').disabled = false;
-                document.getElementById('p2').value = "Karşı"; document.getElementById('p2').disabled = false;
-                document.getElementById('p1').value = "Sağ"; document.getElementById('p1').disabled = false;
-                document.getElementById('p3').value = "Sol"; document.getElementById('p3').disabled = false;
-            }
+            const fields = [
+                { id: 'p0', team: 'Biz',   solo: 'Ben',   isTeam },
+                { id: 'p2', team: 'Biz',   solo: 'Karşı', isTeam },
+                { id: 'p1', team: 'Rakip', solo: 'Sağ',   isTeam },
+                { id: 'p3', team: 'Rakip', solo: 'Sol',   isTeam },
+            ];
+            fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                el.value    = f.isTeam ? f.team : f.solo;
+                el.disabled = f.isTeam;
+            });
         }
 
         function startGame() {
-            gameState.teamMode = setupState.teamMode;
+            gameState.teamMode    = setupState.teamMode;
             gameState.startNumber = setupState.startNumber;
-            
             if (gameState.teamMode) {
                 gameState.playerNames = ['Biz', 'Rakip', 'Biz', 'Rakip'];
                 gameState.scores = [gameState.startNumber, gameState.startNumber];
             } else {
-                gameState.playerNames = [
-                    document.getElementById('p0').value,
-                    document.getElementById('p1').value,
-                    document.getElementById('p2').value,
-                    document.getElementById('p3').value
-                ];
+                gameState.playerNames = ['p0','p1','p2','p3'].map(id => document.getElementById(id).value);
                 gameState.scores = Array(4).fill(gameState.startNumber);
             }
-            
-            gameState.history = [];
-            gameState.gameActive = true;
-            gameState.version = APP_VERSION;
-
-            updateUI();
-            saveState();
+            gameState.history = []; gameState.gameActive = true; gameState.version = APP_VERSION;
+            updateUI(); saveState();
         }
 
         function onPlayerClick(index) {
             tempWinnerIndex = index;
-            const name = gameState.playerNames[index];
-            document.getElementById('modalPlayerName').textContent = name;
-            document.getElementById('finishModal').classList.add('active');
+            document.getElementById('modalPlayerName').textContent = gameState.playerNames[index];
+            openModal('finishModal');
         }
 
         function submitRound(type) {
-            document.getElementById('finishModal').classList.remove('active');
+            closeModal('finishModal');
             const points = { 'normal': 2, 'okey': 4, 'double': 8 }[type];
-            let winner = tempWinnerIndex;
+            let winner   = tempWinnerIndex;
 
-            if(gameState.teamMode) {
-                winner = (tempWinnerIndex % 2); 
-                const loserTeam = (winner === 0) ? 1 : 0;
-                gameState.scores[loserTeam] -= points;
+            if (gameState.teamMode) {
+                winner = tempWinnerIndex % 2;
+                gameState.scores[winner === 0 ? 1 : 0] -= points;
             } else {
-                for(let i=0; i<4; i++) {
-                    if(i !== winner) gameState.scores[i] -= points;
-                }
+                for (let i=0; i<4; i++) if (i !== winner) gameState.scores[i] -= points;
             }
 
-            gameState.history.push({
-                winnerMask: tempWinnerIndex,
-                finish: type,
-                points: points
-            });
-            
-            checkForEnd();
-            updateUI();
-            saveState();
+            gameState.history.push({ winnerMask: tempWinnerIndex, finish: type, points });
+            checkForEnd(); updateUI(); saveState();
         }
 
         function checkForEnd() {
-            let loserExists = false;
-            gameState.scores.forEach(s => { if(s <= 0) loserExists = true; });
-            if(loserExists) {
-                 showDialog("Oyun Bitti!", "Skor sıfırlandı. Yeni oyun?", (yes)=>{
-                    if(yes) { localStorage.removeItem('okeyGameStatev14'); window.location.reload(); }
+            if (gameState.scores.some(s => s <= 0)) {
+                showDialog("Oyun Bitti!", "Skor sıfırlandı. Yeni oyun?", yes => {
+                    if (yes) { localStorage.removeItem('okeyGameStatev14'); window.location.reload(); }
                 }, "confirm");
             }
         }
 
-        // --- EDIT ---
         function openEditModal(historyIndex) {
-            editState.index = historyIndex;
-            const round = gameState.history[historyIndex];
+            editState.index  = historyIndex;
+            const round      = gameState.history[historyIndex];
             editState.finish = round.finish;
-            
-            const sel = document.getElementById('editWinnerSelect');
-            sel.innerHTML = '';
-            
-            if(gameState.teamMode) {
-                const opt1 = new Option("Biz", 0); sel.add(opt1);
-                const opt2 = new Option("Rakip", 1); sel.add(opt2);
-                sel.value = round.winnerMask % 2; 
+            const sel        = document.getElementById('editWinnerSelect');
+            sel.innerHTML    = '';
+            if (gameState.teamMode) {
+                sel.add(new Option("Biz", 0)); sel.add(new Option("Rakip", 1));
+                sel.value = round.winnerMask % 2;
             } else {
-                gameState.playerNames.forEach((n, i) => {
-                    const opt = new Option(n, i); sel.add(opt);
-                });
+                gameState.playerNames.forEach((n, i) => sel.add(new Option(n, i)));
                 sel.value = round.winnerMask;
             }
-            
             updateEditFinish(round.finish);
-            document.getElementById('editModal').classList.add('active');
+            openModal('editModal');
         }
 
         function updateEditFinish(type) {
             editState.finish = type;
-            document.querySelectorAll('.f-btn').forEach(b => b.style.opacity = "0.5");
             const btnMap = { 'normal': 'editBtnTypeNormal', 'okey': 'editBtnTypeOkey', 'double': 'editBtnTypeDouble' };
-            document.getElementById(btnMap[type]).style.opacity = "1";
-            document.getElementById(btnMap[type]).style.borderWidth = "3px";
+            document.querySelectorAll('.finish-options .f-btn').forEach(b => { b.style.opacity = "0.5"; b.style.borderWidth = "2px"; });
+            const el = document.getElementById(btnMap[type]);
+            if (el) { el.style.opacity = "1"; el.style.borderWidth = "3px"; }
         }
 
         function saveEditRound() {
-            const hIdx = editState.index;
+            const hIdx    = editState.index;
             const oldRound = gameState.history[hIdx];
-            
-            if(gameState.teamMode) {
-                const oldLoser = (oldRound.winnerMask % 2 === 0) ? 1 : 0;
-                gameState.scores[oldLoser] += oldRound.points;
+            if (gameState.teamMode) {
+                gameState.scores[(oldRound.winnerMask % 2 === 0) ? 1 : 0] += oldRound.points;
             } else {
-                for(let i=0; i<4; i++) if(i !== oldRound.winnerMask) gameState.scores[i] += oldRound.points;
+                for (let i=0; i<4; i++) if (i !== oldRound.winnerMask) gameState.scores[i] += oldRound.points;
             }
-
             const newWinnerVal = parseInt(document.getElementById('editWinnerSelect').value);
-            const newPoints = { 'normal': 2, 'okey': 4, 'double': 8 }[editState.finish];
-
-            if(gameState.teamMode) {
-                const newLoser = (newWinnerVal === 0) ? 1 : 0;
-                gameState.scores[newLoser] -= newPoints;
+            const newPoints    = { 'normal': 2, 'okey': 4, 'double': 8 }[editState.finish];
+            if (gameState.teamMode) {
+                gameState.scores[newWinnerVal === 0 ? 1 : 0] -= newPoints;
             } else {
-                for(let i=0; i<4; i++) if(i !== newWinnerVal) gameState.scores[i] -= newPoints;
+                for (let i=0; i<4; i++) if (i !== newWinnerVal) gameState.scores[i] -= newPoints;
             }
-
-            gameState.history[hIdx] = {
-                winnerMask: newWinnerVal,
-                finish: editState.finish,
-                points: newPoints
-            };
-
-            document.getElementById('editModal').classList.remove('active');
-            updateUI();
-            saveState();
+            gameState.history[hIdx] = { winnerMask: newWinnerVal, finish: editState.finish, points: newPoints };
+            closeEditModal(); updateUI(); saveState();
         }
 
-        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); editingRoundIndex = null; }
+        function closeEditModal() { closeModal('editModal'); }
 
         function deleteRound(index) {
-            if(index !== gameState.history.length - 1) { showDialog("Hata", "Sadece son el silinebilir", null, "alert"); return; }
-            showDialog("Eli Sil", "Puanlar geri alınacak.", (yes)=>{
-                if(yes) {
+            if (index !== gameState.history.length - 1) { showDialog("Hata", "Sadece son el silinebilir", null, "alert"); return; }
+            showDialog("Eli Sil", "Puanlar geri alınacak.", yes => {
+                if (yes) {
                     const round = gameState.history[index];
-                    if(gameState.teamMode) {
-                        const loser = round.winner === 0 ? 1 : 0;
-                        gameState.scores[loser] += round.points;
+                    if (gameState.teamMode) {
+                        gameState.scores[(round.winnerMask % 2 === 0) ? 1 : 0] += round.points;
                     } else {
-                        for (let i = 0; i < 4; i++) if (i !== round.winner) gameState.scores[i] += round.points;
+                        for (let i=0; i<4; i++) if (i !== round.winnerMask) gameState.scores[i] += round.points;
                     }
                     gameState.history.splice(index, 1);
                     updateUI(); saveState();
@@ -475,114 +318,94 @@
             }, "danger");
         }
 
-        // --- SHEET ---
         function openSheetModal() {
             let html = `<table class="score-table"><thead><tr><th>EL</th>`;
-            if(gameState.teamMode) html += `<th>Biz</th><th>Rakip</th>`;
+            if (gameState.teamMode) html += `<th>Biz</th><th>Rakip</th>`;
             else gameState.playerNames.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
             html += `</tr></thead><tbody>`;
-
             gameState.history.forEach((h, idx) => {
                 html += `<tr><td>${idx+1}</td>`;
-                let roundDiffs = gameState.teamMode ? [0,0] : [0,0,0,0];
-                if(gameState.teamMode) {
-                    const loser = (h.winnerMask % 2 === 0) ? 1 : 0;
-                    roundDiffs[loser] = -h.points;
-                } else {
-                    for(let i=0; i<4; i++) if(i !== h.winnerMask) roundDiffs[i] = -h.points;
-                }
-                roundDiffs.forEach(d => {
-                    const color = d < 0 ? '#e74c3c' : '#2c3e50';
-                    html += `<td style="color:${color}">${d === 0 ? '-' : d}</td>`;
-                });
+                let diffs = gameState.teamMode ? [0,0] : [0,0,0,0];
+                if (gameState.teamMode) diffs[(h.winnerMask % 2 === 0) ? 1 : 0] = -h.points;
+                else for (let i=0; i<4; i++) if (i !== h.winnerMask) diffs[i] = -h.points;
+                diffs.forEach(d => { const color = d < 0 ? '#e74c3c' : '#2c3e50'; html += `<td style="color:${color}">${d === 0 ? '-' : d}</td>`; });
                 html += `</tr>`;
             });
             html += `<tr class="total-row"><td>KALAN</td>`;
             gameState.scores.forEach(s => html += `<td>${s}</td>`);
             html += `</tr></tbody></table>`;
             document.getElementById('sheetContent').innerHTML = html;
-            document.getElementById('sheetModal').classList.add('active');
+            openModal('sheetModal');
         }
-        function closeSheetModal() { document.getElementById('sheetModal').classList.remove('active'); }
 
         function updateUI() {
-            if(!gameState.gameActive) {
-                document.getElementById('setupSection').classList.add('active');
-                document.getElementById('scoreboard').classList.remove('active');
+            const setup = document.getElementById('setupSection');
+            const board = document.getElementById('scoreboard');
+            const hRight = document.querySelector('.header-right');
+            if (!gameState.gameActive) {
+                setup.classList.add('active'); board.classList.remove('active');
                 document.getElementById('gameOver').classList.remove('active');
-                document.querySelector('.header-right').style.display = 'none';
-                return;
+                hRight.style.display = 'none'; return;
             }
-            document.getElementById('setupSection').classList.remove('active');
-            document.getElementById('scoreboard').classList.add('active');
-            document.querySelector('.header-right').style.display = 'flex';
+            setup.classList.remove('active'); board.classList.add('active');
+            hRight.style.display = 'flex';
 
-            const table = document.getElementById('gameTable');
+            const table  = document.getElementById('gameTable');
             const center = document.querySelector('.pos-center');
             table.innerHTML = ''; table.appendChild(center);
 
-            for(let i=0; i<4; i++) {
-                const name = gameState.playerNames[i];
-                let score = 0;
-                if(gameState.teamMode) {
-                    score = (i % 2 === 0) ? gameState.scores[0] : gameState.scores[1];
-                    var teamClass = (i % 2 === 0) ? 'team-a' : 'team-b';
-                } else {
-                    score = gameState.scores[i];
-                    var teamClass = '';
-                }
-                const card = document.createElement('div');
-                card.className = `player-card ${POSITIONS[i]} ${teamClass}`;
-                card.onclick = () => onPlayerClick(i);
+            for (let i=0; i<4; i++) {
+                const name  = gameState.playerNames[i];
+                const score = gameState.teamMode ? gameState.scores[i % 2] : gameState.scores[i];
+                const teamC = gameState.teamMode ? (i % 2 === 0 ? 'team-a' : 'team-b') : '';
+                const card  = document.createElement('div');
+                card.className = `player-card ${POSITIONS[i]} ${teamC}`;
+                card.onclick   = () => onPlayerClick(i);
                 card.innerHTML = `<div class="p-name">${name}</div><div class="p-score">${score}</div>`;
                 table.appendChild(card);
             }
 
             const hList = document.getElementById('historyList');
             hList.innerHTML = '';
-            if(gameState.history.length === 0) hList.innerHTML = '<div style="color: #999; font-size: 13px; text-align:center;">Henüz el kaydı yok</div>';
-
+            if (gameState.history.length === 0) hList.innerHTML = '<div style="color:#999; font-size:13px; text-align:center;">Henüz el kaydı yok</div>';
             [...gameState.history].reverse().forEach((h, idx) => {
-                const realIdx = gameState.history.length - 1 - idx;
-                const handNumber = realIdx + 1;
+                const realIdx   = gameState.history.length - 1 - idx;
                 const finishName = { 'normal': 'Normal', 'okey': 'Okey', 'double': 'Katlama' }[h.finish];
-                const wName = gameState.playerNames[h.winnerMask];
-                let delBtn = '';
-                if(realIdx === gameState.history.length - 1) delBtn = `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>`;
-
+                const wName     = gameState.playerNames[h.winnerMask];
+                const delBtn    = realIdx === gameState.history.length-1 ? `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>` : '';
                 hList.innerHTML += `
                     <div class="h-item">
-                        <div class="history-item-text"><span style="color:#667eea; font-weight:bold; margin-right:5px;">${handNumber}. El:</span><span><strong>${wName}</strong> - ${finishName}</span></div>
-                        <div class="history-item-buttons"><button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>${delBtn}</div>
-                    </div>
-                `;
+                        <div class="h-left"><span style="color:var(--accent); font-weight:bold;">${realIdx+1}. El:</span> <strong>${wName}</strong> — ${finishName}</div>
+                        <div class="h-actions"><button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>${delBtn}</div>
+                    </div>`;
             });
         }
 
         function saveState() { localStorage.setItem('okeyGameStatev14', JSON.stringify(gameState)); }
         function loadState() {
             const s = localStorage.getItem('okeyGameStatev14');
-            if(s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} }
-            else { localStorage.removeItem('okeyGameStatev12'); localStorage.removeItem('okeyGameStatev13'); }
+            if (s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} }
         }
-        function resetGameAttempt() { showDialog("Sıfırla", "Oyun verileri silinecek.", (y) => { if(y) { localStorage.removeItem('okeyGameStatev14'); window.location.reload(); } }, "danger"); }
-        function goHome() { if(gameState.gameActive) showDialog("Çıkış", "Menüye dön?", (y)=>{if(y) window.location.href='index.html';}, "normal"); else window.location.href='index.html'; }
+        function resetGameAttempt() { showDialog("Sıfırla", "Oyun verileri silinecek.", y => { if(y){ localStorage.removeItem('okeyGameStatev14'); window.location.reload(); } }, "danger"); }
+        function goHome() {
+            if (gameState.gameActive) showDialog("Çıkış", "Menüye dön?", y => { if(y) window.location.href='index.html'; }, "normal");
+            else window.location.href = 'index.html';
+        }
 
         function showDialog(title, msg, callback, type) {
-            const box = document.getElementById('customDialog');
             document.getElementById('dTitle').textContent = title;
-            document.getElementById('dMsg').textContent = msg;
+            document.getElementById('dMsg').textContent   = msg;
             const act = document.getElementById('dActions');
             act.innerHTML = '';
-            
-            if(type === 'alert') {
-                 const b = document.createElement('button'); b.className = 'dialog-btn d-confirm'; b.textContent = "Tamam";
-                 b.onclick = () => { box.classList.remove('active'); }; act.appendChild(b);
+            const box = document.getElementById('customDialog');
+            if (type === 'alert') {
+                const b = document.createElement('button'); b.className = 'd-btn d-confirm'; b.textContent = "Tamam";
+                b.onclick = () => box.classList.remove('active'); act.appendChild(b);
             } else {
-                const b1 = document.createElement('button'); b1.className = 'dialog-btn d-cancel'; b1.textContent = "Vazgeç"; b1.onclick = () => { box.classList.remove('active'); callback(false); };
-                const b2 = document.createElement('button'); b2.className = 'dialog-btn d-confirm'; 
-                if(type === 'danger') b2.className = 'dialog-btn d-confirm'; // Kırmızı CSS
-                b2.textContent = "Onayla"; b2.onclick = () => { box.classList.remove('active'); callback(true); };
+                const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç";
+                b1.onclick = () => { box.classList.remove('active'); if(callback) callback(false); };
+                const b2 = document.createElement('button'); b2.className = 'd-btn d-confirm'; b2.textContent = "Onayla";
+                b2.onclick = () => { box.classList.remove('active'); if(callback) callback(true); };
                 act.appendChild(b1); act.appendChild(b2);
             }
             box.classList.add('active');

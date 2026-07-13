@@ -4,135 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Batak Skor</title>
+    <link rel="stylesheet" href="common.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; overscroll-behavior-y: contain; }
-        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
-
-        /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10;
+        /* ── BATAK RENK TOKENları ─────────────────── */
+        :root {
+            --accent:    #2c3e50;
+            --accent-lg: #34495e;
         }
-        .header h1 { font-size: 20px; font-weight: 800; margin: 0; }
-        .header-right { display: flex; gap: 15px; }
-        .btn-icon { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; }
+        .header      { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-lg) 100%); }
+        .btn-start   { background: var(--accent-lg); }
+        .score-table th { background: var(--accent); }
+        .h-item      { border-left-color: var(--accent-lg); }
+        .p-score     { font-size: 24px; font-weight: 800; color: var(--accent-lg); }
 
-        .content { flex: 1; padding: 16px; overflow-y: auto; }
-
-        /* SETUP SECTION */
-        .setup-section { display: none; }
-        .setup-section.active { display: block; }
-
-        /* GAME TYPE BUTTONS */
-        .game-type-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-bottom: 20px; }
+        /* ── BATAK'A ÖZGÜ ─────────────────────────── */
+        .game-type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
         .gt-btn {
-            padding: 10px 2px; border: 1px solid #ccc; background: white; border-radius: 8px;
-            font-size: 11px; font-weight: bold; color: #555; cursor: pointer; text-align: center;
+            padding: 10px 2px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            text-align: center;
         }
-        .gt-btn.selected { background: #34495e; color: white; border-color: #34495e; }
+        .gt-btn.selected { background: var(--accent-lg); color: white; border-color: var(--accent-lg); }
 
-        /* TABLE LAYOUT */
-        .table-layout {
-            display: grid; grid-template-columns: 1fr 1.2fr 1fr; grid-template-rows: auto auto auto;
-            gap: 10px; margin-bottom: 20px; align-items: center;
-        }
-        .pos-top { grid-column: 2; grid-row: 1; }
-        .pos-left { grid-column: 1; grid-row: 2; }
-        .pos-right { grid-column: 3; grid-row: 2; }
-        .pos-bottom { grid-column: 2; grid-row: 3; }
-        .pos-center { grid-column: 2; grid-row: 2; min-height: 100px; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        .setup-input-wrapper { text-align: center; }
-        .setup-label { font-size: 11px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
-        .player-name-input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; }
-        .player-name-input:disabled { background: #f0f0f0; color: #999; border-color: #eee; }
-        
-        .btn-start { width: 100%; padding: 14px; background: #34495e; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px;}
-
-        /* SCOREBOARD */
-        .scoreboard { display: none; }
-        .scoreboard.active { display: block; }
-
-        .player-card {
-            background: white; border: 2px solid #eee; border-radius: 12px; padding: 10px;
-            position: relative; transition: all 0.2s; text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 12px; cursor: pointer;
-        }
-        .player-card:active { transform: scale(0.95); background: #eef2f3; }
-        
-        .team-a { border-left: 4px solid #3498db; } /* Biz */
-        .team-b { border-left: 4px solid #e74c3c; } /* Rakip */
-        
-        .p-name { font-weight: bold; color: #2c3e50; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-score { font-size: 24px; font-weight: 800; color: #34495e; }
+        .team-a { border-left: 4px solid #3498db; }
+        .team-b { border-left: 4px solid #e74c3c; }
 
         .center-button {
-            background: #34495e; color: white; border: none; padding: 0; border-radius: 50%;
-            width: 90px; height: 90px; font-weight: bold; font-size: 12px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--accent-lg);
+            color: white;
+            border: none;
+            padding: 0;
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(44,62,80,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         .center-button:active { transform: scale(0.95); }
 
-        /* HISTORY */
-        .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .h-item { background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px; font-size: 12px; border-left: 4px solid #34495e; display: flex; justify-content: space-between; align-items: center; }
-        .h-left { flex: 1; }
-        .h-header { font-weight: bold; color: #2c3e50; margin-bottom: 4px; display: flex; justify-content: space-between; margin-right: 10px;}
-        .h-bid-info { background: #ecf0f1; padding: 2px 6px; border-radius: 4px; font-size: 10px; color: #7f8c8d; }
-        .h-details { color: #666; line-height: 1.4; font-size: 11px; }
-        .h-actions { display: flex; gap: 5px; margin-left: 8px; }
-
-        .btn-small { padding: 6px 12px; border-radius: 4px; border: none; color: white; font-size: 11px; cursor: pointer; font-weight: 600; }
-        .btn-edit { background: #2196F3; } .btn-del { background: #f44336; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
-        .modal.active { display: flex; }
-        .modal-sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 95vh; overflow-y: auto; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
-        .modal-content { background: white; border-radius: 12px 12px 0 0; padding: 20px; width: 100%; max-height: 90vh; overflow-y: auto; text-align: center; }
-
-        .game-panel { background: #f0f3f4; padding: 15px; border-radius: 10px; border: 1px solid #d6dbdf; margin-bottom: 0; }
+        /* İhale giriş paneli */
         .bid-section { background: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
-        .bid-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .bid-label { font-weight: bold; font-size: 13px; color: #333; }
-        .bid-select { padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: white; flex: 1; margin-left: 10px; font-size: 14px; }
+        .bid-row     { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .bid-label   { font-weight: bold; font-size: 13px; color: #333; }
+        .bid-select  { padding: 8px; border-radius: 6px; border: 1px solid #ccc; background: white; flex: 1; margin-left: 10px; font-size: 14px; }
 
-        .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .input-name { font-weight: 600; font-size: 13px; width: 70px; text-align: left; color: #2c3e50; }
-        .input-controls { display: flex; align-items: center; gap: 8px; }
-        .btn-math { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; color: #2c3e50; }
-        .val-box { font-size: 18px; font-weight: bold; width: 30px; text-align: center; color: #2c3e50; }
-        
-        .check-bar { text-align: center; margin: 10px 0; font-size: 12px; font-weight: bold; color: #95a5a6; }
-        .check-bar.ok { color: #27ae60; }
-        .check-bar.err { color: #e74c3c; }
-        
-        /* BUTONLAR */
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-modal-action { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; transition: background 0.3s; }
-        .btn-gray { background: #ecf0f1; color: #2c3e50; }
-        .btn-green { background: #27ae60; color: white; }
-        .btn-green:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; color: white; }
+        .btn-green-batak { background: #27ae60; color: white; }
+        .btn-green-batak:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; }
 
-        /* SHEET & DIALOG */
-        .score-table-container { overflow-x: auto; margin-bottom: 20px; }
-        .score-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .score-table th { background: #34495e; color: white; padding: 8px 2px; font-weight: bold; }
-        .score-table td { border-bottom: 1px solid #eee; padding: 6px 2px; color: #2c3e50; }
-        .score-table tr:nth-child(even) { background: #f9f9f9; }
-        .score-table .total-row { font-weight: bold; background: #ecf0f1 !important; color: #2c3e50; }
-
-        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
-        .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 20px; border-radius: 12px; width: 80%; max-width: 300px; text-align: center; }
-        .d-btn { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .d-confirm { background: #34495e; color: white; }
-        .d-cancel { background: #eee; color: #333; margin-right: 10px; }
-
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
+        /* Dialog butonları */
+        .d-danger { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
@@ -148,8 +85,8 @@
 
         <div class="content">
             <div class="setup-section active" id="setupSection">
-                <div class="setup-group">
-                    <label>Oyun Türü</label>
+                <div style="margin-bottom:15px;">
+                    <label style="font-size:12px; font-weight:bold; color:#666; display:block; margin-bottom:8px;">Oyun Türü</label>
                     <div class="game-type-grid">
                         <button class="gt-btn selected" onclick="selectGameType('ihaleli', this)">İhaleli</button>
                         <button class="gt-btn" onclick="selectGameType('esli', this)">Eşli</button>
@@ -179,7 +116,7 @@
                 </div>
 
                 <div class="history-area">
-                    <div style="font-size:12px; font-weight:bold; color:#95a5a6; margin-bottom:5px;">GEÇMİŞ ELLER</div>
+                    <div class="history-label">Geçmiş Eller</div>
                     <div id="historyList"></div>
                 </div>
             </div>
@@ -187,10 +124,10 @@
         <div class="footer-version" id="footerVersion">v1.1.0</div>
     </div>
 
+    <!-- Skor Giriş Modal -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
-            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:15px; color:#2c3e50;">Skorları Gir</div>
-            
+            <div class="modal-title">Skorları Gir</div>
             <div class="bid-section" id="bidSection">
                 <div class="bid-row">
                     <span class="bid-label">İhaleyi Alan:</span>
@@ -201,55 +138,57 @@
                     <select id="bidAmountSelect" class="bid-select"></select>
                 </div>
             </div>
-
             <div class="game-panel">
                 <div id="inputRows"></div>
                 <div class="check-bar" id="inputTotalCheck">Toplam: 0 / 13</div>
             </div>
-
             <div class="modal-actions">
                 <button class="btn-modal-action btn-gray" onclick="closeModal('inputModal')">İptal</button>
-                <button class="btn-modal-action btn-green" id="btnInputSave" onclick="saveRound()" disabled>KAYDET</button>
+                <button class="btn-modal-action btn-green-batak" id="btnInputSave" onclick="saveRound()" disabled>KAYDET</button>
             </div>
         </div>
     </div>
 
+    <!-- Düzenleme Modal -->
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:15px; color:#2c3e50;">Eli Düzenle</div>
+            <div class="modal-title">Eli Düzenle</div>
             <div class="game-panel">
                 <div id="editInputRows"></div>
                 <div class="check-bar" id="editTotalCheck"></div>
             </div>
             <div class="modal-actions">
                 <button class="btn-modal-action btn-gray" onclick="closeModal('editModal')">İptal</button>
-                <button class="btn-modal-action btn-green" id="btnEditSave" onclick="saveEditRound()">GÜNCELLE</button>
+                <button class="btn-modal-action btn-green-batak" id="btnEditSave" onclick="saveEditRound()">GÜNCELLE</button>
             </div>
         </div>
     </div>
 
+    <!-- Puan Tablosu Modal -->
     <div class="modal" id="sheetModal">
         <div class="modal-sheet">
-            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:10px; color:#2c3e50;">Puan Tablosu</div>
+            <div class="modal-title">Puan Tablosu</div>
             <div id="sheetContent" style="flex:1; overflow:auto;"></div>
             <button onclick="closeModal('sheetModal')" style="width:100%; padding:12px; margin-top:10px; border:none; background:#eee; border-radius:8px; flex-shrink:0;">Kapat</button>
         </div>
     </div>
 
+    <!-- Confirm Dialog -->
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <h3 id="dTitle" style="margin:0 0 10px 0;"></h3>
-            <p id="dMsg" style="color:#666; font-size:14px;"></p>
-            <div id="dActions" style="display:flex; gap:10px; margin-top:15px;"></div>
+            <h3 id="dTitle"></h3>
+            <p id="dMsg"></p>
+            <div id="dActions" class="d-actions"></div>
         </div>
     </div>
 
+    <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.1.0';
-        document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
+        setFooterVersion(APP_VERSION);
 
         const POSITIONS = ['pos-bottom', 'pos-right', 'pos-top', 'pos-left'];
-        
+
         let gameState = {
             version: APP_VERSION,
             gameType: 'ihaleli',
@@ -260,84 +199,53 @@
         };
 
         let inputState = { values: [0,0,0,0] };
-        let editState = { index: null, values: [0,0,0,0] };
-        let selectedGameType = 'ihaleli'; // Geçici seçim
+        let editState  = { index: null, values: [0,0,0,0] };
+        let selectedGameType = 'ihaleli';
 
         window.onload = loadState;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+        // Player card tıklaması
         document.addEventListener('click', e => {
-            if(e.target.closest('button')) {
-                playClickSound();
-            } else if(e.target.closest('.player-card')) {
-                playClickSound();
-                if(gameState.gameActive) {
-                    // Kime tıkladıysak onu pre-select yap
-                    // card elemanını bul ve indexini al
-                    const card = e.target.closest('.player-card');
-                    const index = parseInt(card.getAttribute('data-index'));
-                    openInputModal(index);
-                }
+            const card = e.target.closest('.player-card');
+            if (card && gameState.gameActive) {
+                const index = parseInt(card.getAttribute('data-index'));
+                openInputModal(index);
             }
         });
 
-        function playClickSound() {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-        }
-
-        // --- SETUP LOGIC ---
+        // --- SETUP ---
         function selectGameType(type, btn) {
             selectedGameType = type;
             document.querySelectorAll('.gt-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            
-            const p2input = document.getElementById('p2');
-            const p0input = document.getElementById('p0');
-            const p1input = document.getElementById('p1');
-            const p3input = document.getElementById('p3');
 
-            // Gömmeli Modu (3 Kişi)
-            if(type === 'gommeli') {
-                p2input.value = "---"; p2input.disabled = true;
+            const p = [document.getElementById('p0'), document.getElementById('p1'),
+                       document.getElementById('p2'), document.getElementById('p3')];
+
+            if (type === 'gommeli') {
+                p[2].value = "---"; p[2].disabled = true;
                 document.querySelector('.pos-top').style.opacity = "0.3";
-                // İsimleri standart yap
-                p0input.value = "Ben"; p1input.value = "Sağ"; p3input.value = "Sol";
-                p0input.disabled = false; p1input.disabled = false; p3input.disabled = false;
-            } 
-            // Eşli Modu (Biz/Rakip)
-            else if (type === 'esli') {
-                p2input.disabled = false; document.querySelector('.pos-top').style.opacity = "1";
-                
-                p0input.value = "Biz"; p0input.disabled = true;
-                p2input.value = "Biz"; p2input.disabled = true;
-                
-                p1input.value = "Rakip"; p1input.disabled = true;
-                p3input.value = "Rakip"; p3input.disabled = true;
-            }
-            // İhaleli / Koz Maça
-            else {
-                p2input.disabled = false; document.querySelector('.pos-top').style.opacity = "1";
-                p0input.value = "Ben"; p0input.disabled = false;
-                p1input.value = "Sağ"; p1input.disabled = false;
-                p2input.value = "Karşı"; p2input.disabled = false;
-                p3input.value = "Sol"; p3input.disabled = false;
+                p[0].value = "Ben";  p[0].disabled = false;
+                p[1].value = "Sağ";  p[1].disabled = false;
+                p[3].value = "Sol";  p[3].disabled = false;
+            } else if (type === 'esli') {
+                p[2].disabled = false; document.querySelector('.pos-top').style.opacity = "1";
+                p[0].value = "Biz";   p[0].disabled = true;
+                p[2].value = "Biz";   p[2].disabled = true;
+                p[1].value = "Rakip"; p[1].disabled = true;
+                p[3].value = "Rakip"; p[3].disabled = true;
+            } else {
+                p[2].disabled = false; document.querySelector('.pos-top').style.opacity = "1";
+                p[0].value = "Ben";   p[0].disabled = false;
+                p[1].value = "Sağ";   p[1].disabled = false;
+                p[2].value = "Karşı"; p[2].disabled = false;
+                p[3].value = "Sol";   p[3].disabled = false;
             }
         }
 
         function startGame() {
             gameState.gameType = selectedGameType;
-            gameState.players = [
-                document.getElementById('p0').value,
-                document.getElementById('p1').value,
-                document.getElementById('p2').value,
-                document.getElementById('p3').value
-            ];
+            gameState.players = ['p0','p1','p2','p3'].map(id => document.getElementById(id).value);
             gameState.scores = [0,0,0,0];
             gameState.history = [];
             gameState.gameActive = true;
@@ -349,278 +257,234 @@
         function openInputModal(preSelectedBidderIndex = null) {
             const isKozMaca = gameState.gameType === 'kozmaca';
             document.getElementById('bidSection').style.display = isKozMaca ? 'none' : 'block';
-            
-            // İhaleci Doldur
+
             const bidderSel = document.getElementById('bidderSelect');
             bidderSel.innerHTML = '';
             gameState.players.forEach((p, i) => {
-                if(gameState.gameType === 'gommeli' && i === 2) return;
-                const opt = document.createElement('option');
-                opt.value = i; opt.text = p; 
-                bidderSel.appendChild(opt);
+                if (gameState.gameType === 'gommeli' && i === 2) return;
+                bidderSel.appendChild(new Option(p, i));
             });
+            if (preSelectedBidderIndex !== null) bidderSel.value = preSelectedBidderIndex;
 
-            // Karta tıklandıysa o kişiyi seç
-            if (preSelectedBidderIndex !== null) {
-                bidderSel.value = preSelectedBidderIndex;
-            }
-
-            // İhale Rakamı Doldur
             const bidAmountSel = document.getElementById('bidAmountSelect');
             bidAmountSel.innerHTML = '';
-            // Gömmeli'de genelde 8'den başlar (16 el var çünkü)
-            const minBid = (gameState.gameType === 'gommeli') ? 8 : 5;
-            const maxBid = (gameState.gameType === 'gommeli') ? 16 : 13;
+            const minBid = gameState.gameType === 'gommeli' ? 8 : 5;
+            const maxBid = gameState.gameType === 'gommeli' ? 16 : 13;
+            for (let i = minBid; i <= maxBid; i++) bidAmountSel.appendChild(new Option(i, i));
 
-            for(let i=minBid; i<=maxBid; i++) {
-                const opt = new Option(i, i); bidAmountSel.appendChild(opt);
-            }
-            
             inputState.values = [0,0,0,0];
             renderInputs('inputRows', false);
             validateInputs(false);
-            document.getElementById('inputModal').classList.add('active');
+            openModal('inputModal');
         }
 
         function renderInputs(containerId, isEdit) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             const vals = isEdit ? editState.values : inputState.values;
-            
+
             gameState.players.forEach((p, i) => {
-                if(gameState.gameType === 'gommeli' && i === 2) return;
+                if (gameState.gameType === 'gommeli' && i === 2) return;
                 const row = document.createElement('div');
                 row.className = 'input-row';
                 row.innerHTML = `
                     <div class="input-name">${p}</div>
                     <div class="input-controls">
-                        <button class="btn-math" onclick="changeVal(${i}, -1, ${isEdit})">-</button>
+                        <button class="btn-math" onclick="changeVal(${i}, -1, ${isEdit})">−</button>
                         <div class="val-box" id="${isEdit?'edit-':''}val-${i}">${vals[i]}</div>
                         <button class="btn-math" onclick="changeVal(${i}, 1, ${isEdit})">+</button>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(row);
             });
         }
 
         function changeVal(i, delta, isEdit) {
             const vals = isEdit ? editState.values : inputState.values;
+            const max  = gameState.gameType === 'gommeli' ? 16 : 13;
             const newVal = vals[i] + delta;
-            // Üst sınır: Gömmeli 16, Normal 13
-            const max = (gameState.gameType === 'gommeli') ? 16 : 13;
-            if(newVal < 0 || newVal > max) return;
-            
+            if (newVal < 0 || newVal > max) return;
             vals[i] = newVal;
             document.getElementById(`${isEdit?'edit-':''}val-${i}`).textContent = newVal;
             validateInputs(isEdit);
         }
 
         function validateInputs(isEdit) {
-            const vals = isEdit ? editState.values : inputState.values;
-            const total = vals.reduce((a,b) => a+b, 0);
-            const target = (gameState.gameType === 'gommeli') ? 16 : 13; 
-            
+            const vals   = isEdit ? editState.values : inputState.values;
+            const total  = vals.reduce((a,b) => a+b, 0);
+            const target = gameState.gameType === 'gommeli' ? 16 : 13;
             const bar = document.getElementById(isEdit ? 'editTotalCheck' : 'inputTotalCheck');
             const btn = document.getElementById(isEdit ? 'btnEditSave' : 'btnInputSave');
-            
             bar.textContent = `Toplam: ${total} / ${target}`;
-            if(total === target) {
-                bar.className = 'check-bar ok'; btn.disabled = false;
-            } else {
-                bar.className = 'check-bar err'; btn.disabled = true;
-            }
+            bar.className = `check-bar ${total === target ? 'ok' : 'err'}`;
+            btn.disabled = total !== target;
         }
 
         function saveRound() {
             const bidder = parseInt(document.getElementById('bidderSelect').value);
-            const bid = parseInt(document.getElementById('bidAmountSelect').value);
+            const bid    = parseInt(document.getElementById('bidAmountSelect').value);
             const tricks = inputState.values;
-            let points = [0,0,0,0];
+            let points   = [0,0,0,0];
 
-            if(gameState.gameType === 'kozmaca') {
+            if (gameState.gameType === 'kozmaca') {
                 gameState.players.forEach((_, i) => {
-                    if(gameState.gameType === 'gommeli' && i === 2) return;
-                    points[i] = (tricks[i] === 0) ? -50 : tricks[i] * 10;
+                    if (gameState.gameType === 'gommeli' && i === 2) return;
+                    points[i] = tricks[i] === 0 ? -50 : tricks[i] * 10;
                 });
             } else {
                 gameState.players.forEach((_, i) => {
-                    if(gameState.gameType === 'gommeli' && i === 2) return;
-                    if(i === bidder) {
-                        points[i] = (tricks[i] >= bid) ? (bid * 10) + ((tricks[i] - bid) * 10) : -(bid * 10);
-                    } else {
-                        points[i] = (tricks[i] === 0) ? -50 : tricks[i] * 10;
-                    }
+                    if (gameState.gameType === 'gommeli' && i === 2) return;
+                    if (i === bidder) points[i] = tricks[i] >= bid ? (bid*10)+((tricks[i]-bid)*10) : -(bid*10);
+                    else points[i] = tricks[i] === 0 ? -50 : tricks[i] * 10;
                 });
             }
 
-            if(gameState.gameType === 'esli') {
-                const t1 = points[0] + points[2];
-                const t2 = points[1] + points[3];
+            if (gameState.gameType === 'esli') {
+                const t1 = points[0]+points[2], t2 = points[1]+points[3];
                 points[0] = t1; points[2] = t1; points[1] = t2; points[3] = t2;
             }
 
-            for(let i=0; i<4; i++) gameState.scores[i] += points[i];
-            
+            for (let i=0; i<4; i++) gameState.scores[i] += points[i];
             gameState.history.push({
-                bidder: (gameState.gameType === 'kozmaca' ? -1 : bidder),
-                bid: (gameState.gameType === 'kozmaca' ? 0 : bid),
-                tricks: [...tricks],
-                points: points
+                bidder: gameState.gameType === 'kozmaca' ? -1 : bidder,
+                bid:    gameState.gameType === 'kozmaca' ? 0 : bid,
+                tricks: [...tricks], points
             });
-
             closeModal('inputModal'); updateUI(); saveState();
         }
 
-        // --- EDIT / DELETE ---
         function openEditModal(index) {
             const h = gameState.history[index];
             editState.index = index;
             editState.values = [...h.tricks];
             renderInputs('editInputRows', true);
             validateInputs(true);
-            document.getElementById('editModal').classList.add('active');
+            openModal('editModal');
         }
 
         function saveEditRound() {
-            const idx = editState.index;
+            const idx  = editState.index;
             const oldH = gameState.history[idx];
-            for(let i=0; i<4; i++) gameState.scores[i] -= oldH.points[i];
-            
-            const bidder = oldH.bidder;
-            const bid = oldH.bid;
+            for (let i=0; i<4; i++) gameState.scores[i] -= oldH.points[i];
+
             const tricks = editState.values;
+            const bidder = oldH.bidder, bid = oldH.bid;
             let points = [0,0,0,0];
 
-             if(gameState.gameType === 'kozmaca') {
+            if (gameState.gameType === 'kozmaca') {
                 gameState.players.forEach((_, i) => {
-                    if(gameState.gameType === 'gommeli' && i === 2) return;
-                    if(tricks[i] === 0) points[i] = -50; else points[i] = tricks[i] * 10;
+                    if (gameState.gameType === 'gommeli' && i === 2) return;
+                    points[i] = tricks[i] === 0 ? -50 : tricks[i] * 10;
                 });
             } else {
                 gameState.players.forEach((_, i) => {
-                    if(gameState.gameType === 'gommeli' && i === 2) return;
-                    if(i === bidder) {
-                        if(tricks[i] >= bid) points[i] = (bid * 10) + ((tricks[i] - bid) * 10);
-                        else points[i] = -(bid * 10);
-                    } else {
-                        if(tricks[i] === 0) points[i] = -50; else points[i] = tricks[i] * 10;
-                    }
+                    if (gameState.gameType === 'gommeli' && i === 2) return;
+                    if (i === bidder) points[i] = tricks[i] >= bid ? (bid*10)+((tricks[i]-bid)*10) : -(bid*10);
+                    else points[i] = tricks[i] === 0 ? -50 : tricks[i] * 10;
                 });
             }
-             if(gameState.gameType === 'esli') {
-                const t1 = points[0] + points[2]; const t2 = points[1] + points[3];
+            if (gameState.gameType === 'esli') {
+                const t1 = points[0]+points[2], t2 = points[1]+points[3];
                 points[0] = t1; points[2] = t1; points[1] = t2; points[3] = t2;
             }
 
-            for(let i=0; i<4; i++) gameState.scores[i] += points[i];
+            for (let i=0; i<4; i++) gameState.scores[i] += points[i];
             gameState.history[idx].tricks = tricks;
             gameState.history[idx].points = points;
-
             closeModal('editModal'); updateUI(); saveState();
         }
 
         function deleteRound(index) {
-            if(index !== gameState.history.length - 1) { alert("Sadece son el silinebilir"); return; }
-            showDialog("Eli Sil", "Puanlar geri alınacak.", (yes)=>{
-                if(yes) {
+            if (index !== gameState.history.length - 1) { alert("Sadece son el silinebilir"); return; }
+            showDialog("Eli Sil", "Puanlar geri alınacak.", yes => {
+                if (yes) {
                     const h = gameState.history[index];
-                    for(let i=0; i<4; i++) gameState.scores[i] -= h.points[i];
+                    for (let i=0; i<4; i++) gameState.scores[i] -= h.points[i];
                     gameState.history.splice(index, 1);
                     updateUI(); saveState();
                 }
             }, "danger");
         }
 
-        // --- SHEET & UI ---
         function openSheetModal() {
-             const grandTotal = [0,0,0,0];
-             let html = `<table class="score-table"><thead><tr><th>EL</th>`;
-             gameState.players.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
-             html += `</tr></thead><tbody>`;
-             gameState.history.forEach((h, idx) => {
-                 html += `<tr><td>${idx+1}</td>`;
-                 for(let i=0; i<4; i++) { grandTotal[i] += h.points[i]; html += `<td>${h.points[i]}</td>`; }
-                 html += `</tr>`;
-             });
-             html += `<tr class="total-row"><td>TOP</td>`;
-             grandTotal.forEach(t => html += `<td>${t}</td>`);
-             html += `</tr></tbody></table>`;
-             document.getElementById('sheetContent').innerHTML = html;
-             document.getElementById('sheetModal').classList.add('active');
+            const grandTotal = [0,0,0,0];
+            let html = `<table class="score-table"><thead><tr><th>EL</th>`;
+            gameState.players.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
+            html += `</tr></thead><tbody>`;
+            gameState.history.forEach((h, idx) => {
+                html += `<tr><td>${idx+1}</td>`;
+                for (let i=0; i<4; i++) { grandTotal[i] += h.points[i]; html += `<td>${h.points[i]}</td>`; }
+                html += `</tr>`;
+            });
+            html += `<tr class="total-row"><td>TOP</td>`;
+            grandTotal.forEach(t => html += `<td>${t}</td>`);
+            html += `</tr></tbody></table>`;
+            document.getElementById('sheetContent').innerHTML = html;
+            openModal('sheetModal');
         }
 
         function updateUI() {
-            if(!gameState.gameActive) {
-                document.getElementById('setupSection').classList.add('active');
-                document.getElementById('scoreboard').classList.remove('active');
-                return;
-            }
-            document.getElementById('setupSection').classList.remove('active');
-            document.getElementById('scoreboard').classList.add('active');
+            const setup = document.getElementById('setupSection');
+            const board = document.getElementById('scoreboard');
+            if (!gameState.gameActive) { setup.classList.add('active'); board.classList.remove('active'); return; }
+            setup.classList.remove('active'); board.classList.add('active');
 
-            const table = document.getElementById('gameTable');
+            const table  = document.getElementById('gameTable');
             const center = document.querySelector('.pos-center');
             table.innerHTML = ''; table.appendChild(center);
 
             gameState.players.forEach((p, i) => {
-                if(gameState.gameType === 'gommeli' && i === 2) return;
+                if (gameState.gameType === 'gommeli' && i === 2) return;
                 const card = document.createElement('div');
                 card.className = `player-card ${POSITIONS[i]}`;
-                card.setAttribute('data-index', i); // Indexi attribute olarak ekle
-                if(gameState.gameType === 'esli') card.classList.add(i%2===0 ? 'team-a' : 'team-b');
+                card.setAttribute('data-index', i);
+                if (gameState.gameType === 'esli') card.classList.add(i%2===0 ? 'team-a' : 'team-b');
                 card.innerHTML = `<div class="p-name">${p}</div><div class="p-score">${gameState.scores[i]}</div>`;
                 table.appendChild(card);
             });
 
             const list = document.getElementById('historyList');
             list.innerHTML = '';
-            if(gameState.history.length === 0) list.innerHTML = '<div style="color:#ccc; font-size:11px; text-align:center; padding:10px;">Henüz el girilmedi</div>';
+            if (gameState.history.length === 0) list.innerHTML = '<div style="color:#ccc; font-size:11px; text-align:center; padding:10px;">Henüz el girilmedi</div>';
 
             [...gameState.history].reverse().forEach((h, idx) => {
                 const realIdx = gameState.history.length - 1 - idx;
-                let info = "";
-                if(gameState.gameType === 'kozmaca') info = "Koz Maça";
-                else info = `${gameState.players[h.bidder]} (${h.bid})`;
-
-                let details = "";
-                h.tricks.forEach((t, i) => {
-                    if(gameState.gameType === 'gommeli' && i === 2) return;
-                    details += `${gameState.players[i]}:${t} `;
-                });
-
-                let delBtn = '';
-                if(realIdx === gameState.history.length - 1) delBtn = `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>`;
-
+                const info    = gameState.gameType === 'kozmaca' ? 'Koz Maça' : `${gameState.players[h.bidder]} (${h.bid})`;
+                let details = '';
+                h.tricks.forEach((t, i) => { if (gameState.gameType === 'gommeli' && i === 2) return; details += `${gameState.players[i]}:${t} `; });
+                const delBtn = realIdx === gameState.history.length-1 ? `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>` : '';
                 list.innerHTML += `
                     <div class="h-item">
                         <div class="h-left"><div class="h-header"><span>${realIdx+1}. El</span><span class="h-bid-info">${info}</span></div><div class="h-details">${details}</div></div>
                         <div class="h-actions"><button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>${delBtn}</div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
         function saveState() { localStorage.setItem('batakStatev1', JSON.stringify(gameState)); }
-        function loadState() { 
-            const s = localStorage.getItem('batakStatev1'); 
-            if(s) { 
-                try{ gameState = JSON.parse(s); updateUI(); }catch(e){} 
-            } else {
-                localStorage.removeItem('batakState'); // Eski versiyonları sil
-            }
+        function loadState() {
+            const s = localStorage.getItem('batakStatev1');
+            if (s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} }
         }
-        function resetGame() { showDialog("Sıfırla", "Her şey silinsin mi?", (y)=>{ if(y){ localStorage.removeItem('batakStatev1'); window.location.reload(); } }, "danger"); }
-        function goHome() { if(gameState.gameActive) showDialog("Çıkış", "Menüye dön?", (y)=>{if(y) window.location.href='index.html';}, "normal"); else window.location.href='index.html'; }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function resetGame() {
+            showDialog("Sıfırla", "Her şey silinsin mi?", y => {
+                if (y) { localStorage.removeItem('batakStatev1'); window.location.reload(); }
+            }, "danger");
+        }
+        function goHome() {
+            if (gameState.gameActive) showDialog("Çıkış", "Menüye dön?", y => { if(y) window.location.href='index.html'; }, "normal");
+            else window.location.href = 'index.html';
+        }
 
         function showDialog(title, msg, callback, type) {
-            const box = document.getElementById('customDialog');
             document.getElementById('dTitle').textContent = title;
             document.getElementById('dMsg').textContent = msg;
             const act = document.getElementById('dActions');
             act.innerHTML = '';
-            const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç"; b1.onclick = () => { box.classList.remove('active'); callback(false); };
-            const b2 = document.createElement('button'); b2.className = 'd-btn ' + (type === 'danger' ? 'd-danger' : 'd-confirm'); b2.textContent = "Onayla"; b2.onclick = () => { box.classList.remove('active'); callback(true); };
+            const box = document.getElementById('customDialog');
+            const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç";
+            b1.onclick = () => { box.classList.remove('active'); if(callback) callback(false); };
+            const b2 = document.createElement('button'); b2.className = 'd-btn ' + (type === 'danger' ? 'd-danger' : 'd-confirm');
+            b2.textContent = "Onayla"; b2.onclick = () => { box.classList.remove('active'); if(callback) callback(true); };
             act.appendChild(b1); act.appendChild(b2);
             box.classList.add('active');
         }

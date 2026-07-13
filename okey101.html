@@ -4,131 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>101 Okey Skor</title>
+    <link rel="stylesheet" href="common.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; overscroll-behavior-y: contain; }
-        .container { max-width: 600px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        /* ── 101 OKEY RENK TOKENları ──────────────── */
+        :root { --accent: #ee5253; }
+        .header      { background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%); }
+        .btn-start   { background: var(--accent); box-shadow: 0 4px 10px rgba(238,82,83,0.3); }
+        .score-table th { background: var(--accent); }
+        .h-item      { border-left-color: var(--accent); }
+        .p-score     { font-size: 24px; font-weight: 800; color: var(--accent); }
+        .player-card:active { background: #fff0f0; border-color: var(--accent); }
 
-        /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
-            color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10;
-        }
-        .header h1 { font-size: 22px; font-weight: 800; margin: 0; }
-        .header-right { display: flex; gap: 20px; align-items: center; }
-        .btn-icon { background: none; border: none; color: white; font-size: 32px; cursor: pointer; padding: 5px; line-height: 1; display: flex; align-items: center; }
-        .btn-icon:active { transform: scale(0.9); opacity: 0.8; }
-
-        .content { flex: 1; padding: 16px; overflow-y: auto; }
-
-        /* SETUP */
-        .setup-section { display: none; }
-        .setup-section.active { display: block; }
-        
-        .table-layout {
-            display: grid; grid-template-columns: 1fr 1.2fr 1fr; grid-template-rows: auto auto auto;
-            gap: 10px; margin-bottom: 20px; align-items: center;
-        }
-        .pos-top { grid-column: 2; grid-row: 1; }
-        .pos-left { grid-column: 1; grid-row: 2; }
-        .pos-right { grid-column: 3; grid-row: 2; }
-        .pos-bottom { grid-column: 2; grid-row: 3; }
-        .pos-center { grid-column: 2; grid-row: 2; min-height: 100px; display: flex; align-items: center; justify-content: center; z-index: 5; }
-
-        .setup-input-wrapper { text-align: center; }
-        .setup-label { font-size: 12px; font-weight: bold; color: #95a5a6; margin-bottom: 4px; display: block; }
-        .player-name-input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; text-align: center; font-weight: 600; color: #2c3e50; font-size: 16px;}
-        
-        .btn-start { width: 100%; padding: 16px; background: #ee5253; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(238, 82, 83, 0.3); }
-
-        /* SCOREBOARD */
-        .scoreboard { display: none; }
-        .scoreboard.active { display: block; }
-
-        .player-card {
-            background: white; border: 2px solid #eee; border-radius: 12px; padding: 10px;
-            position: relative; transition: all 0.2s; text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 12px; cursor: pointer;
-        }
-        .player-card:active { transform: scale(0.95); background: #fff0f0; border-color: #ee5253; }
-        
-        .p-name { font-weight: bold; color: #2c3e50; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .p-score { font-size: 24px; font-weight: 800; color: #ee5253; }
-
-        .center-info { 
-            text-align: center; color: #bdc3c7; font-size: 11px; font-weight: bold; line-height: 1.4; 
-            border: 2px dashed #eee; padding: 10px; border-radius: 50%; width: 100px; height: 100px;
+        /* ── 101'E ÖZGÜ ───────────────────────────── */
+        .center-info {
+            text-align: center; color: #bdc3c7; font-size: 11px; font-weight: bold; line-height: 1.4;
+            border: 2px dashed #eee; padding: 10px; border-radius: 50%;
+            width: 100px; height: 100px;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* MODAL & INPUTS */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: flex-end; }
-        .modal.active { display: flex; }
-        .modal-sheet { background: white; width: 100%; border-radius: 20px 20px 0 0; padding: 20px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; display: flex; flex-direction: column; }
-
         .finish-types { display: flex; gap: 10px; margin-bottom: 20px; }
         .f-btn { flex: 1; padding: 12px; border: 2px solid #eee; background: white; border-radius: 8px; font-weight: bold; color: #555; cursor: pointer; }
-        .f-btn.selected { background: #ee5253; color: white; border-color: #ee5253; }
+        .f-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
 
         .loser-input-row { display: flex; align-items: center; margin-bottom: 12px; }
-        .l-name { width: 50px; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .l-name  { width: 50px; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .l-input-group { flex: 1; display: flex; gap: 8px; }
         .l-input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; }
-        .btn-101 { padding: 0 12px; background: #fff0f0; color: #ee5253; border: 1px solid #ffcccc; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; white-space: nowrap; }
-        .btn-101:active { background: #ee5253; color: white; }
+        .btn-101 { padding: 0 12px; background: #fff0f0; color: var(--accent); border: 1px solid #ffcccc; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; white-space: nowrap; }
+        .btn-101:active { background: var(--accent); color: white; }
 
-        /* BUTONLAR */
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-modal-action { flex: 1; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; transition: background 0.3s; }
-        
-        .btn-gray { background: #ecf0f1; color: #2c3e50; }
-        .btn-green { background: #27ae60; color: white; }
-
-        .btn-green:disabled { background: #bdc3c7; cursor: not-allowed; opacity: 0.7; color: white; }
-
-        /* HISTORY */
-        .history-area { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
-        .h-item { background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #eee; margin-bottom: 8px; font-size: 12px; border-left: 4px solid #ee5253; display: flex; justify-content: space-between; align-items: center; }
-        .h-left { flex: 1; }
-        .h-header { font-weight: bold; color: #2c3e50; margin-bottom: 4px; }
-        .h-details { color: #666; line-height: 1.4; font-size: 11px; }
-        .h-actions { display: flex; gap: 5px; margin-left: 8px; }
-
-        .btn-small { padding: 6px 12px; border-radius: 4px; border: none; color: white; font-size: 11px; cursor: pointer; font-weight: 600; }
-        .btn-edit { background: #2196F3; }
-        .btn-del { background: #f44336; }
-
-        /* TABLE SHEET */
-        .score-table-container { overflow-x: auto; margin-bottom: 20px; }
-        .score-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .score-table th { background: #ee5253; color: white; padding: 8px 2px; font-weight: bold; }
-        .score-table td { border-bottom: 1px solid #eee; padding: 6px 2px; color: #2c3e50; }
-        .score-table tr:nth-child(even) { background: #f9f9f9; }
-        .score-table .total-row { font-weight: bold; background: #ecf0f1 !important; color: #d35400; }
-        .score-table .game-col { text-align: left; padding-left: 5px; font-weight: 600; }
-
-        /* DIALOG (YENİ TASARIM) */
-        .custom-dialog { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 3000; align-items: center; justify-content: center; }
-        .custom-dialog.active { display: flex; }
-        .dialog-box { background: white; padding: 24px; border-radius: 16px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .dialog-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: #2c3e50; }
-        .dialog-message { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.5; }
-        
-        /* Dialog Butonları Eşit ve Geniş */
-        .dialog-actions { display: flex; gap: 10px; width: 100%; }
-        .dialog-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: background 0.3s; }
-        
-        /* Vazgeç (Yeşil - Güvenli) */
-        .d-cancel { background: #27ae60; color: white; }
-        .d-cancel:active { background: #219150; }
-        
-        /* Onayla (Kırmızı - Riskli) */
-        .d-confirm { background: #ee5253; color: white; }
-        .d-confirm:active { background: #e63b3b; }
-
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .footer-version { text-align: center; padding: 10px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; margin-top: auto; }
+        .multiplier-msg { font-size: 11px; color: var(--accent); margin: 10px 0; text-align: center; display: none; }
     </style>
 </head>
 <body>
@@ -151,21 +57,18 @@
                     <div class="pos-right setup-input-wrapper"><label class="setup-label">Sağ</label><input type="text" class="player-name-input" id="p1" value="Sağ"></div>
                     <div class="pos-bottom setup-input-wrapper"><label class="setup-label">Ben</label><input type="text" class="player-name-input" id="p0" value="Ben"></div>
                 </div>
-                
                 <button class="btn-start" onclick="startGame()">Oyunu Başlat</button>
             </div>
 
             <div class="scoreboard" id="scoreboard">
                 <div class="table-layout" id="gameTable">
                     <div class="pos-center">
-                        <div class="center-info">
-                            BİTEN OYUNCUNUN<br>KARTINA TIKLA
-                        </div>
+                        <div class="center-info">BİTEN OYUNCUNUN<br>KARTINA TIKLA</div>
                     </div>
                 </div>
 
                 <div class="history-area">
-                    <div style="font-size:12px; font-weight:bold; color:#95a5a6; margin-bottom:5px;">GEÇMİŞ ELLER</div>
+                    <div class="history-label">Geçmiş Eller</div>
                     <div id="historyList"></div>
                 </div>
             </div>
@@ -173,74 +76,70 @@
         <div class="footer-version" id="footerVersion">v1.4.3</div>
     </div>
 
+    <!-- Skor Giriş Modal -->
     <div class="modal" id="inputModal">
         <div class="modal-sheet">
             <div style="text-align:center; margin-bottom:5px; font-weight:bold; font-size:16px;">
-                <span id="modalWinnerName" style="color:#ee5253;"></span> Bitti
+                <span id="modalWinnerName" style="color:var(--accent);"></span> Bitti
             </div>
             <div style="text-align:center; font-size:12px; color:#999; margin-bottom:15px;">Diğer oyuncuların cezalarını girin</div>
-            
             <div class="finish-types">
                 <button class="f-btn selected" id="btnTypeNormal" onclick="setFinishType('normal', false)">Normal Bitiş</button>
                 <button class="f-btn" id="btnTypeOkey" onclick="setFinishType('okey', false)">Okey / Çift (x2)</button>
             </div>
-
             <div id="modalInputs"></div>
-
-            <div style="font-size:11px; color:#ee5253; margin:10px 0; text-align:center; display:none;" id="multiplierMsg">
-                * Girilen puanlar (ve açmadı cezası) x2 yapılacaktır.
-            </div>
-
+            <div class="multiplier-msg" id="multiplierMsg">* Girilen puanlar (ve açmadı cezası) x2 yapılacaktır.</div>
             <div class="modal-actions">
-                <button class="btn-modal-action btn-gray" onclick="closeModal()">İptal</button>
+                <button class="btn-modal-action btn-gray" onclick="closeModal('inputModal')">İptal</button>
                 <button class="btn-modal-action btn-green" id="btnModalSave" onclick="submitRound()" disabled>KAYDET</button>
             </div>
         </div>
     </div>
 
+    <!-- Düzenleme Modal -->
     <div class="modal" id="editModal">
         <div class="modal-sheet">
             <div style="text-align:center; margin-bottom:5px; font-weight:bold; font-size:16px;">Eli Düzenle</div>
-            <div style="text-align:center; font-size:13px; color:#ee5253; font-weight:bold; margin-bottom:15px;">Biten: <span id="editWinnerName"></span></div>
-            
+            <div style="text-align:center; font-size:13px; color:var(--accent); font-weight:bold; margin-bottom:15px;">Biten: <span id="editWinnerName"></span></div>
             <div class="finish-types">
                 <button class="f-btn" id="editBtnTypeNormal" onclick="setFinishType('normal', true)">Normal</button>
                 <button class="f-btn" id="editBtnTypeOkey" onclick="setFinishType('okey', true)">Okey (x2)</button>
             </div>
-
             <div id="editModalInputs"></div>
-
             <div class="modal-actions">
-                <button class="btn-modal-action btn-gray" onclick="closeEditModal()">İptal</button>
+                <button class="btn-modal-action btn-gray" onclick="closeModal('editModal')">İptal</button>
                 <button class="btn-modal-action btn-green" id="btnEditSave" onclick="saveEditRound()">GÜNCELLE</button>
             </div>
         </div>
     </div>
 
+    <!-- Puan Tablosu Modal -->
     <div class="modal" id="sheetModal">
         <div class="modal-sheet">
-            <div style="text-align:center; font-weight:bold; font-size:16px; margin-bottom:10px; color:#2c3e50;">Puan Tablosu</div>
+            <div class="modal-title">Puan Tablosu</div>
             <div id="sheetContent" style="flex:1; overflow:auto;"></div>
             <div class="modal-actions">
-                <button onclick="closeSheetModal()" class="btn-modal-action btn-green">Kapat</button>
+                <button onclick="closeModal('sheetModal')" class="btn-modal-action btn-green">Kapat</button>
             </div>
         </div>
     </div>
 
+    <!-- Confirm Dialog -->
     <div class="custom-dialog" id="customDialog">
         <div class="dialog-box">
-            <h3 id="dTitle" class="dialog-title"></h3>
-            <p id="dMsg" class="dialog-message"></p>
-            <div id="dActions" class="dialog-actions"></div>
+            <h3 id="dTitle"></h3>
+            <p id="dMsg"></p>
+            <div id="dActions" class="d-actions"></div>
         </div>
     </div>
 
+    <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.4.3';
-        document.getElementById('footerVersion').textContent = 'v' + APP_VERSION;
+        setFooterVersion(APP_VERSION);
 
         const POSITIONS = ['pos-bottom', 'pos-right', 'pos-top', 'pos-left'];
-        
+
         let gameState = {
             version: APP_VERSION,
             startNumber: 0,
@@ -251,96 +150,68 @@
         };
 
         let roundState = { winnerIndex: null, finishType: 'normal' };
-        let editState = { index: null, winnerIndex: null, finishType: 'normal' };
+        let editState  = { index: null, winnerIndex: null, finishType: 'normal' };
 
         window.onload = loadState;
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        document.addEventListener('click', e => {
-            if(e.target.closest('button') || e.target.closest('.player-card')) {
-                if(audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
-            }
-        });
 
         function startGame() {
             gameState.startNumber = 0;
-            gameState.scores = [0, 0, 0, 0];
-            gameState.playerNames = [
-                document.getElementById('p0').value,
-                document.getElementById('p1').value,
-                document.getElementById('p2').value,
-                document.getElementById('p3').value
-            ];
-            gameState.history = [];
-            gameState.gameActive = true;
-            gameState.version = APP_VERSION;
-
-            updateUI();
-            saveState();
+            gameState.scores      = [0, 0, 0, 0];
+            gameState.playerNames = ['p0','p1','p2','p3'].map(id => document.getElementById(id).value);
+            gameState.history     = [];
+            gameState.gameActive  = true;
+            gameState.version     = APP_VERSION;
+            updateUI(); saveState();
         }
 
-        // --- MODAL LOGIC ---
         function onPlayerClick(index) {
             roundState.winnerIndex = index;
             document.getElementById('modalWinnerName').textContent = gameState.playerNames[index];
             setFinishType('normal', false);
             renderModalInputs('modalInputs', false);
             validateModalInputs(false);
-            document.getElementById('inputModal').classList.add('active');
+            openModal('inputModal');
         }
-
-        function closeModal() { document.getElementById('inputModal').classList.remove('active'); }
-        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
         function setFinishType(type, isEdit) {
             const isOkey = type === 'okey';
-            if(!isEdit) {
+            if (!isEdit) {
                 roundState.finishType = type;
                 document.getElementById('btnTypeNormal').className = isOkey ? 'f-btn' : 'f-btn selected';
-                document.getElementById('btnTypeOkey').className = isOkey ? 'f-btn selected' : 'f-btn';
+                document.getElementById('btnTypeOkey').className   = isOkey ? 'f-btn selected' : 'f-btn';
                 document.getElementById('multiplierMsg').style.display = isOkey ? 'block' : 'none';
             } else {
                 editState.finishType = type;
                 document.getElementById('editBtnTypeNormal').className = isOkey ? 'f-btn' : 'f-btn selected';
-                document.getElementById('editBtnTypeOkey').className = isOkey ? 'f-btn selected' : 'f-btn';
+                document.getElementById('editBtnTypeOkey').className   = isOkey ? 'f-btn selected' : 'f-btn';
             }
         }
 
         function renderModalInputs(containerId, isEdit) {
-            const container = document.getElementById(containerId);
+            const container   = document.getElementById(containerId);
             container.innerHTML = '';
-            const winnerIdx = isEdit ? editState.winnerIndex : roundState.winnerIndex;
+            const winnerIdx   = isEdit ? editState.winnerIndex : roundState.winnerIndex;
             const historyItem = isEdit ? gameState.history[editState.index] : null;
 
             gameState.playerNames.forEach((name, index) => {
                 if (index === winnerIdx) return;
-
-                let value = "";
-                if(isEdit) {
+                let value = '';
+                if (isEdit) {
                     let savedScore = historyItem.changes[index];
-                    if(historyItem.type === 'okey') savedScore = savedScore / 2;
+                    if (historyItem.type === 'okey') savedScore = savedScore / 2;
                     value = savedScore;
                 }
-
-                const row = document.createElement('div');
+                const row     = document.createElement('div');
                 row.className = 'loser-input-row';
                 const inputId = isEdit ? `edit-input-${index}` : `input-${index}`;
-                const func = isEdit ? `validateModalInputs(true)` : `validateModalInputs(false)`;
-                const set101 = `document.getElementById('${inputId}').value = 101; ${func}`;
-
+                const func    = `validateModalInputs(${isEdit})`;
+                const set101  = `document.getElementById('${inputId}').value=101;${func}`;
                 row.innerHTML = `
                     <div class="l-name">${name}</div>
                     <div class="l-input-group">
                         <input type="number" class="l-input" id="${inputId}" placeholder="0" value="${value}" oninput="${func}">
                         <button class="btn-101" onclick="${set101}">Açmadı</button>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(row);
             });
         }
@@ -348,24 +219,15 @@
         function validateModalInputs(isEdit) {
             let isValid = true;
             const inputs = document.querySelectorAll(isEdit ? '#editModalInputs .l-input' : '#modalInputs .l-input');
-            inputs.forEach(input => {
-                const val = parseInt(input.value);
-                if (isNaN(val) || val <= 0) isValid = false;
-            });
+            inputs.forEach(input => { const val = parseInt(input.value); if (isNaN(val) || val <= 0) isValid = false; });
             document.getElementById(isEdit ? 'btnEditSave' : 'btnModalSave').disabled = !isValid;
         }
 
         function submitRound() {
             const changes = processRound(roundState.winnerIndex, roundState.finishType, 'modalInputs');
-            for(let i=0; i<4; i++) gameState.scores[i] += changes[i];
-            
-            gameState.history.push({
-                winner: roundState.winnerIndex,
-                type: roundState.finishType,
-                changes: changes
-            });
-            
-            closeModal(); updateUI(); saveState();
+            for (let i=0; i<4; i++) gameState.scores[i] += changes[i];
+            gameState.history.push({ winner: roundState.winnerIndex, type: roundState.finishType, changes });
+            closeModal('inputModal'); updateUI(); saveState();
         }
 
         function processRound(winnerIdx, type, inputContainerId) {
@@ -373,12 +235,10 @@
             const winnerDeduction = isOkey ? -202 : -101;
             let roundChanges = Array(4).fill(0);
             roundChanges[winnerIdx] = winnerDeduction;
-
             gameState.playerNames.forEach((_, index) => {
                 if (index !== winnerIdx) {
                     const prefix = inputContainerId === 'editModalInputs' ? 'edit-input-' : 'input-';
-                    const input = document.getElementById(prefix + index);
-                    let val = parseInt(input.value);
+                    let val = parseInt(document.getElementById(prefix + index).value);
                     if (isNaN(val)) val = 0;
                     if (isOkey) val = val * 2;
                     roundChanges[index] = val;
@@ -387,87 +247,70 @@
             return roundChanges;
         }
 
-        // --- EDIT ---
         function openEditModal(index) {
             const h = gameState.history[index];
-            editState.index = index;
+            editState.index       = index;
             editState.winnerIndex = h.winner;
             document.getElementById('editWinnerName').textContent = gameState.playerNames[h.winner];
             setFinishType(h.type, true);
             renderModalInputs('editModalInputs', true);
             validateModalInputs(true);
-            document.getElementById('editModal').classList.add('active');
+            openModal('editModal');
         }
 
         function saveEditRound() {
             const idx = editState.index;
             const oldH = gameState.history[idx];
-            for(let i=0; i<4; i++) gameState.scores[i] -= oldH.changes[i];
+            for (let i=0; i<4; i++) gameState.scores[i] -= oldH.changes[i];
             const newChanges = processRound(editState.winnerIndex, editState.finishType, 'editModalInputs');
-            for(let i=0; i<4; i++) gameState.scores[i] += newChanges[i];
+            for (let i=0; i<4; i++) gameState.scores[i] += newChanges[i];
             gameState.history[idx] = { winner: editState.winnerIndex, type: editState.finishType, changes: newChanges };
-            closeEditModal(); updateUI(); saveState();
+            closeModal('editModal'); updateUI(); saveState();
         }
 
         function deleteRound(index) {
-            if (index !== gameState.history.length - 1) {
-                alert("Sadece son girilen el silinebilir!");
-                return;
-            }
-            showDialog("Eli Sil", "Bu elin puanları geri alınacak.", (yes) => {
-                if(yes) {
+            if (index !== gameState.history.length - 1) { alert("Sadece son girilen el silinebilir!"); return; }
+            showDialog("Eli Sil", "Bu elin puanları geri alınacak.", yes => {
+                if (yes) {
                     const round = gameState.history[index];
-                    for(let i=0; i<4; i++) gameState.scores[i] -= round.changes[i];
+                    for (let i=0; i<4; i++) gameState.scores[i] -= round.changes[i];
                     gameState.history.splice(index, 1);
                     updateUI(); saveState();
                 }
             }, "danger");
         }
 
-        // --- SHEET ---
         function openSheetModal() {
             const totals = [0,0,0,0];
-            const wName = gameState.playerNames;
-            
             let html = `<table class="score-table"><thead><tr><th>EL</th>`;
-            wName.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
+            gameState.playerNames.forEach(p => html += `<th>${p.substr(0,3)}</th>`);
             html += `</tr></thead><tbody>`;
-
             gameState.history.forEach((h, idx) => {
                 html += `<tr><td>${idx+1}</td>`;
-                h.changes.forEach((val, i) => {
-                    totals[i] += val;
-                    html += `<td>${val}</td>`;
-                });
+                h.changes.forEach((val, i) => { totals[i] += val; html += `<td>${val}</td>`; });
                 html += `</tr>`;
             });
-
             html += `<tr class="total-row"><td>TOP</td>`;
             totals.forEach(t => html += `<td>${t}</td>`);
             html += `</tr></tbody></table>`;
-
             document.getElementById('sheetContent').innerHTML = html;
-            document.getElementById('sheetModal').classList.add('active');
+            openModal('sheetModal');
         }
-        function closeSheetModal() { document.getElementById('sheetModal').classList.remove('active'); }
 
         function updateUI() {
-            if(!gameState.gameActive) {
-                document.getElementById('setupSection').classList.add('active');
-                document.getElementById('scoreboard').classList.remove('active');
-                return;
-            }
-            document.getElementById('setupSection').classList.remove('active');
-            document.getElementById('scoreboard').classList.add('active');
+            const setup = document.getElementById('setupSection');
+            const board = document.getElementById('scoreboard');
+            if (!gameState.gameActive) { setup.classList.add('active'); board.classList.remove('active'); return; }
+            setup.classList.remove('active'); board.classList.add('active');
 
-            const table = document.getElementById('gameTable');
+            const table  = document.getElementById('gameTable');
             const center = document.querySelector('.pos-center');
             table.innerHTML = ''; table.appendChild(center);
 
             gameState.playerNames.forEach((p, i) => {
                 const card = document.createElement('div');
                 card.className = `player-card ${POSITIONS[i]}`;
-                card.onclick = () => onPlayerClick(i);
+                card.onclick   = () => onPlayerClick(i);
                 card.innerHTML = `<div class="p-name">${p}</div><div class="p-score">${gameState.scores[i]}</div>`;
                 table.appendChild(card);
             });
@@ -475,71 +318,45 @@
             const hList = document.getElementById('historyList');
             hList.innerHTML = '';
             [...gameState.history].reverse().forEach((h, idx) => {
-                const realIdx = gameState.history.length - 1 - idx;
+                const realIdx  = gameState.history.length - 1 - idx;
                 const typeText = h.type === 'okey' ? 'Okey/Çift (x2)' : 'Normal';
-                const wName = gameState.playerNames[h.winner];
-                let details = '';
-                gameState.playerNames.forEach((name, i) => { if (i !== h.winner) details += `${name}: ${h.changes[i]} <br>`; });
-
-                let delBtn = '';
-                if(realIdx === gameState.history.length - 1) {
-                    delBtn = `<div class="h-actions"><button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button></div>`;
-                }
-
+                const wName    = gameState.playerNames[h.winner];
+                let details    = '';
+                gameState.playerNames.forEach((name, i) => { if (i !== h.winner) details += `${name}: ${h.changes[i]}<br>`; });
+                const delBtn   = realIdx === gameState.history.length-1
+                    ? `<button class="btn-small btn-del" onclick="deleteRound(${realIdx})">SİL</button>` : '';
                 hList.innerHTML += `
                     <div class="h-item">
                         <div class="h-left">
-                            <div class="h-header">
-                                <span>${realIdx + 1}. El - ${wName}</span>
-                                <span style="font-size:10px; color:#666;"> - ${typeText}</span>
-                            </div>
-                            <div class="h-details">
-                                Kazanan: ${h.changes[h.winner]}<br>${details}
-                            </div>
+                            <div class="h-header"><span>${realIdx+1}. El — ${wName}</span><span style="font-size:10px; color:#666;">${typeText}</span></div>
+                            <div class="h-details">Kazanan: ${h.changes[h.winner]}<br>${details}</div>
                         </div>
-                        <div class="h-actions">
-                            <button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>
-                            ${delBtn}
-                        </div>
-                    </div>
-                `;
+                        <div class="h-actions"><button class="btn-small btn-edit" onclick="openEditModal(${realIdx})">DZN</button>${delBtn}</div>
+                    </div>`;
             });
         }
 
         function saveState() { localStorage.setItem('okey101Statev14', JSON.stringify(gameState)); }
-        function loadState() { 
-            const s = localStorage.getItem('okey101Statev14'); 
-            if(s) { 
-                try { gameState = JSON.parse(s); updateUI(); } catch(e){} 
-            } else {
-                localStorage.removeItem('okey101Statev13'); // Clean old
-            }
+        function loadState() {
+            const s = localStorage.getItem('okey101Statev14');
+            if (s) { try { gameState = JSON.parse(s); updateUI(); } catch(e){} }
         }
-        function resetGame() { showDialog("Sıfırla", "Her şey silinsin mi?", (y)=>{ if(y){ localStorage.removeItem('okey101Statev14'); window.location.reload(); } }, "danger"); }
-        function goHome() { if(gameState.gameActive) showDialog("Çıkış", "Menüye dön?", (y)=>{if(y) window.location.href='index.html';}, "normal"); else window.location.href='index.html'; }
+        function resetGame() { showDialog("Sıfırla", "Her şey silinsin mi?", y => { if(y){ localStorage.removeItem('okey101Statev14'); window.location.reload(); } }, "danger"); }
+        function goHome() {
+            if (gameState.gameActive) showDialog("Çıkış", "Menüye dön?", y => { if(y) window.location.href='index.html'; }, "normal");
+            else window.location.href = 'index.html';
+        }
 
         function showDialog(title, msg, callback, type) {
-            const box = document.getElementById('customDialog');
             document.getElementById('dTitle').textContent = title;
             document.getElementById('dMsg').textContent = msg;
             const act = document.getElementById('dActions');
             act.innerHTML = '';
-            
-            const b1 = document.createElement('button'); 
-            b1.className = 'dialog-btn d-cancel'; // Yeşil Vazgeç
-            b1.textContent = "Vazgeç"; 
-            b1.onclick = () => { box.classList.remove('active'); callback(false); };
-            
-            const b2 = document.createElement('button'); 
-            
-            // Eğer 'danger' (Silme/Sıfırlama) ise Kırmızı Onayla
-            // Eğer 'normal' (Çıkış) ise yine Kırmızı Onayla (Çıkış işlemi)
-            // Tasarımda Onayla butonu her zaman kırmızı istenmişti (Riskli işlem gibi)
-            b2.className = 'dialog-btn d-confirm'; // Kırmızı Onayla (CSS'de tanımlı)
-            
-            b2.textContent = "Onayla"; 
-            b2.onclick = () => { box.classList.remove('active'); callback(true); };
-            
+            const box = document.getElementById('customDialog');
+            const b1 = document.createElement('button'); b1.className = 'd-btn d-cancel'; b1.textContent = "Vazgeç";
+            b1.onclick = () => { box.classList.remove('active'); if(callback) callback(false); };
+            const b2 = document.createElement('button'); b2.className = 'd-btn d-confirm'; b2.textContent = "Onayla";
+            b2.onclick = () => { box.classList.remove('active'); if(callback) callback(true); };
             act.appendChild(b1); act.appendChild(b2);
             box.classList.add('active');
         }

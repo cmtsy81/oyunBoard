@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Canlı Masa İzle</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        /* ── İZLE RENK TOKENları ──────────────────── */
+        :root { --accent: #e67e22; }
+        .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); transition: background 0.5s; }
+
+        /* ── GİRİŞ EKRANI ─────────────────────────── */
+        .login-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px 20px;
+        }
+        .login-screen h2 { font-size: 20px; color: #333; font-weight: 800; }
+        .login-input {
+            padding: 15px; font-size: 28px; text-align: center;
+            width: 200px; border: 2px solid #ddd; border-radius: 12px;
+            letter-spacing: 8px; font-weight: bold; outline: none;
+        }
+        .login-input:focus { border-color: var(--accent); }
+        .login-btn {
+            padding: 15px 40px; background: var(--accent); color: white;
+            border: none; border-radius: 10px; font-size: 18px;
+            font-weight: bold; cursor: pointer; width: 200px;
+        }
+        .login-btn:active { opacity: 0.85; transform: scale(0.98); }
+
+        /* ── OYUN ALANI ────────────────────────────── */
+        .game-screen { display: none; }
+        .game-screen.active { display: block; }
+
+        .status-bar {
+            margin: 15px 15px 0;
+            padding: 10px 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #856404;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .live-dot {
+            width: 8px; height: 8px;
+            background: #e74c3c; border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* ── SKOR KARTları ────────────────────────── */
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+        .s-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-top: 4px solid #ddd;
+        }
+        .s-name  { font-size: 14px; color: #666; margin-bottom: 5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .s-point { font-size: 32px; font-weight: 800; color: #2c3e50; }
+
+        /* ── PUAN TABLOSU ALANI ──────────────────── */
+        .sheet-area { margin: 0 15px 20px; }
+        .btn-show-sheet {
+            width: 100%; padding: 15px; background: #27ae60;
+            color: white; border: none; border-radius: 8px;
+            font-weight: bold; cursor: pointer; font-size: 14px;
+        }
+        .sheet-container { margin-top: 15px; overflow-x: auto; display: none; animation: fadeIn 0.5s; }
+        .sheet-container.open { display: block; }
+
+        /* ── FIREBASE HAZIR DEĞİL BANNER ─────────── */
+        .firebase-notice {
+            margin: 20px 15px;
+            padding: 20px;
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .firebase-notice h3 { color: #f39c12; margin-bottom: 8px; }
+        .firebase-notice p  { font-size: 13px; color: #666; line-height: 1.5; }
+        .firebase-notice code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" id="mainHeader">
+            <button class="btn-icon" onclick="window.location.href='index.html'">🏠</button>
+            <h1 id="gameTitle">Canlı Masa</h1>
+            <button class="btn-icon" onclick="forceRefresh()">🔄</button>
+        </div>
+
+        <!-- Firebase bağlantısı beklenirken göster -->
+        <div class="firebase-notice" id="firebaseNotice">
+            <h3>🔥 Firebase Bağlantısı Bekleniyor</h3>
+            <p>Bu özellik <strong>Aşama 2</strong>'de aktive edilecek.<br>
+            Firebase kurulumu tamamlandıktan sonra <code>common.js</code>'e<br>
+            config bilgileri eklenecek ve bu ekran canlı olacak.</p>
+            <p style="margin-top:10px; font-size:12px; color:#aaa;">
+                Şimdilik: Masa kodu girerek localStorage'dan okur<br>(aynı cihazda oynanan oyunları izleyebilirsiniz)
+            </p>
+        </div>
+
+        <!-- Giriş Ekranı -->
+        <div class="login-screen" id="loginScreen">
+            <h2>Masa Kodu</h2>
+            <input type="tel" id="masaInput" class="login-input" placeholder="1234" maxlength="6">
+            <button class="login-btn" onclick="connectToMasa()">BAĞLAN</button>
+        </div>
+
+        <!-- Oyun Ekranı -->
+        <div class="game-screen" id="gameScreen">
+            <div class="status-bar">
+                <div class="live-dot"></div>
+                <span id="statusText">Bağlanıyor...</span>
+            </div>
+
+            <div class="score-grid" id="scoreGrid"></div>
+
+            <div class="sheet-area">
+                <button class="btn-show-sheet" onclick="toggleSheet()">📊 PUAN TABLOSUNU GÖSTER</button>
+                <div class="sheet-container" id="universalSheet"></div>
+            </div>
+        </div>
+
+        <div class="footer-version" id="footerVersion">v2.0.0</div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        const APP_VERSION = '2.0.0';
+        setFooterVersion(APP_VERSION);
+
+        let pollingInterval = null;
+        let currentMasaID  = null;
+        let lastDataHash   = '';
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('masa')) {
+                document.getElementById('masaInput').value = urlParams.get('masa');
+                connectToMasa();
+            }
+        };
+
+        function connectToMasa() {
+            const kod = document.getElementById('masaInput').value.trim();
+            if (kod.length < 4) { alert("En az 4 haneli kod giriniz."); return; }
+            currentMasaID = kod;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('firebaseNotice').style.display = 'none';
+            document.getElementById('gameScreen').classList.add('active');
+            fetchData();
+            if (pollingInterval) clearInterval(pollingInterval);
+            // Şimdilik 3 saniyede bir localStorage'ı kontrol et
+            // Aşama 2'de bu Firestore onSnapshot ile değişecek
+            pollingInterval = setInterval(fetchData, 3000);
+        }
+
+        function forceRefresh() {
+            document.getElementById('statusText').innerText = "Yenileniyor...";
+            fetchData();
+        }
+
+        function fetchData() {
+            // AŞAMA 1: localStorage'dan oku (aynı cihaz, offline)
+            const data = readGameState(currentMasaID);
+
+            if (!data) {
+                document.getElementById('statusText').innerText = "Masa bulunamadı / Henüz yayın yok";
+                return;
+            }
+
+            // Veri değişmediyse güncelleme yapma
+            const dataStr = JSON.stringify(data);
+            if (dataStr === lastDataHash) return;
+            lastDataHash = dataStr;
+
+            updateDisplay(data);
+
+            // AŞAMA 2: Firestore onSnapshot ile değişecek:
+            // db.collection('masalar').doc(currentMasaID).onSnapshot(doc => {
+            //     if (doc.exists) updateDisplay(doc.data());
+            //     else document.getElementById('statusText').innerText = "Masa kapalı";
+            // });
+        }
+
+        function updateDisplay(data) {
+            const header = document.getElementById('mainHeader');
+            const title  = document.getElementById('gameTitle');
+
+            document.getElementById('statusText').innerText = `CANLI • Son: ${new Date().toLocaleTimeString()}`;
+
+            // Header rengi + başlık
+            const gameStyles = {
+                '101':   { bg: '#ee5253', name: '101 Okey' },
+                'batak': { bg: '#2c3e50', name: 'Batak' },
+                'king':  { bg: '#f39c12', name: 'King' },
+                'okey':  { bg: '#667eea', name: 'Düz Okey' },
+            };
+            const style = gameStyles[data.gameType] || { bg: '#e67e22', name: 'Oyun' };
+            header.style.background = style.bg;
+            title.textContent        = `${style.name} (${currentMasaID})`;
+
+            // Skor kartları
+            const grid = document.getElementById('scoreGrid');
+            grid.innerHTML = '';
+
+            if (data.teamMode && data.scores.length === 2) {
+                grid.innerHTML += createCard('BİZ', data.scores[0], style.bg);
+                grid.innerHTML += createCard('RAKİP', data.scores[1], style.bg);
+            } else if (data.names) {
+                data.names.forEach((name, i) => {
+                    grid.innerHTML += createCard(name, data.scores[i], style.bg);
+                });
+            }
+
+            // Puan tablosu (sheetHTML direkt yerleştiriliyor)
+            if (data.sheetHTML) {
+                const sheet = document.getElementById('universalSheet');
+                sheet.innerHTML = data.sheetHTML;
+                // Tablo header rengini eşleştir
+                sheet.querySelectorAll('.score-table th').forEach(th => th.style.background = style.bg);
+            }
+        }
+
+        function createCard(name, score, color) {
+            return `<div class="s-card" style="border-top-color:${color}">
+                <div class="s-name">${name}</div>
+                <div class="s-point">${score}</div>
+            </div>`;
+        }
+
+        function toggleSheet() {
+            const sheet = document.getElementById('universalSheet');
+            const btn   = document.querySelector('.btn-show-sheet');
+            sheet.classList.toggle('open');
+            btn.textContent = sheet.classList.contains('open') ? '📊 GİZLE' : '📊 PUAN TABLOSUNU GÖSTER';
+        }
+    </script>
+</body>
+</html>
