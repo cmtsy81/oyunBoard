@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Canlı Masa İzle</title>
     <link rel="stylesheet" href="common.css">
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         /* ── İZLE RENK TOKENları ──────────────────── */
         :root { --accent: #e67e22; }
-        .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); transition: background 0.5s; }
+        .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); transition: background 0.6s; }
 
         /* ── GİRİŞ EKRANI ─────────────────────────── */
         .login-screen {
@@ -21,238 +24,299 @@
             padding: 40px 20px;
         }
         .login-screen h2 { font-size: 20px; color: #333; font-weight: 800; }
+
         .login-input {
-            padding: 15px; font-size: 28px; text-align: center;
-            width: 200px; border: 2px solid #ddd; border-radius: 12px;
-            letter-spacing: 8px; font-weight: bold; outline: none;
+            padding: 15px;
+            font-size: 36px;
+            text-align: center;
+            width: 220px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            letter-spacing: 10px;
+            font-weight: bold;
+            outline: none;
+            transition: border-color 0.2s;
         }
         .login-input:focus { border-color: var(--accent); }
-        .login-btn {
-            padding: 15px 40px; background: var(--accent); color: white;
-            border: none; border-radius: 10px; font-size: 18px;
-            font-weight: bold; cursor: pointer; width: 200px;
-        }
-        .login-btn:active { opacity: 0.85; transform: scale(0.98); }
 
-        /* ── OYUN ALANI ────────────────────────────── */
+        .login-btn {
+            padding: 16px 40px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 220px;
+            box-shadow: 0 4px 10px rgba(230,126,34,0.3);
+            transition: transform 0.1s;
+        }
+        .login-btn:active { transform: scale(0.98); }
+
+        /* ── OYUN ALANI ─────────────────────────────── */
         .game-screen { display: none; }
         .game-screen.active { display: block; }
 
+        /* ── STATUS BAR ──────────────────────────────── */
         .status-bar {
-            margin: 15px 15px 0;
+            margin: 12px 15px 0;
             padding: 10px 15px;
-            background: #fff3cd;
             border-radius: 8px;
             font-size: 12px;
-            color: #856404;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            transition: background 0.3s;
         }
+        .status-bar.ok   { background: #e8f8f0; color: #27ae60; }
+        .status-bar.wait { background: #fff3cd; color: #856404; }
+        .status-bar.err  { background: #fde8e8; color: #c0392b; }
+
         .live-dot {
             width: 8px; height: 8px;
-            background: #e74c3c; border-radius: 50%;
+            background: #27ae60; border-radius: 50%;
             animation: pulse 1.5s infinite;
+            flex-shrink: 0;
         }
+        .live-dot.waiting { background: #f39c12; animation: none; }
+        .live-dot.error   { background: #e74c3c; animation: none; }
 
-        /* ── SKOR KARTları ────────────────────────── */
+        /* ── SKOR KARTları ──────────────────────────── */
         .score-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             padding: 15px;
         }
         .s-card {
             background: white;
             border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 14px;
+            padding: 18px 10px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-top: 4px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-top: 5px solid #ddd;
+            transition: border-top-color 0.5s, transform 0.2s;
         }
-        .s-name  { font-size: 14px; color: #666; margin-bottom: 5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .s-point { font-size: 32px; font-weight: 800; color: #2c3e50; }
+        .s-card.highlight { transform: scale(1.03); }
+        .s-name  { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .s-point { font-size: 36px; font-weight: 900; color: #2c3e50; line-height: 1; }
+        .s-point.negative { color: #e74c3c; }
 
-        /* ── PUAN TABLOSU ALANI ──────────────────── */
-        .sheet-area { margin: 0 15px 20px; }
-        .btn-show-sheet {
-            width: 100%; padding: 15px; background: #27ae60;
-            color: white; border: none; border-radius: 8px;
-            font-weight: bold; cursor: pointer; font-size: 14px;
+        /* ── BAĞLAN BUTONU ───────────────────────────── */
+        .disconnect-btn {
+            display: block;
+            width: calc(100% - 30px);
+            margin: 0 15px 15px;
+            padding: 12px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 13px;
         }
-        .sheet-container { margin-top: 15px; overflow-x: auto; display: none; animation: fadeIn 0.5s; }
-        .sheet-container.open { display: block; }
 
-        /* ── FIREBASE HAZIR DEĞİL BANNER ─────────── */
-        .firebase-notice {
-            margin: 20px 15px;
-            padding: 20px;
-            background: #fff8e1;
-            border: 1px solid #ffe082;
-            border-radius: 12px;
+        /* ── GÜNCELLEME ZAMANI ───────────────────────── */
+        .last-update {
             text-align: center;
+            font-size: 11px;
+            color: #aaa;
+            padding: 5px;
         }
-        .firebase-notice h3 { color: #f39c12; margin-bottom: 8px; }
-        .firebase-notice p  { font-size: 13px; color: #666; line-height: 1.5; }
-        .firebase-notice code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header" id="mainHeader">
             <button class="btn-icon" onclick="window.location.href='index.html'">🏠</button>
-            <h1 id="gameTitle">Canlı Masa</h1>
-            <button class="btn-icon" onclick="forceRefresh()">🔄</button>
-        </div>
-
-        <!-- Firebase bağlantısı beklenirken göster -->
-        <div class="firebase-notice" id="firebaseNotice">
-            <h3>🔥 Firebase Bağlantısı Bekleniyor</h3>
-            <p>Bu özellik <strong>Aşama 2</strong>'de aktive edilecek.<br>
-            Firebase kurulumu tamamlandıktan sonra <code>common.js</code>'e<br>
-            config bilgileri eklenecek ve bu ekran canlı olacak.</p>
-            <p style="margin-top:10px; font-size:12px; color:#aaa;">
-                Şimdilik: Masa kodu girerek localStorage'dan okur<br>(aynı cihazda oynanan oyunları izleyebilirsiniz)
-            </p>
+            <h1 id="gameTitle">Canlı İzle</h1>
+            <button class="btn-icon" onclick="forceRefresh()" id="btnRefresh">🔄</button>
         </div>
 
         <!-- Giriş Ekranı -->
         <div class="login-screen" id="loginScreen">
-            <h2>Masa Kodu</h2>
-            <input type="tel" id="masaInput" class="login-input" placeholder="1234" maxlength="6">
+            <h2>📡 Masa Kodunu Gir</h2>
+            <p style="text-align:center; color:#888; font-size:13px; margin-top:-10px; line-height:1.5;">
+                Oynayan kişinin paylaştığı<br>4 haneli kodu girin
+            </p>
+            <input type="tel"
+                   id="masaInput"
+                   class="login-input"
+                   placeholder="1234"
+                   maxlength="6"
+                   onkeyup="if(event.key==='Enter') connectToMasa()">
             <button class="login-btn" onclick="connectToMasa()">BAĞLAN</button>
         </div>
 
-        <!-- Oyun Ekranı -->
+        <!-- Oyun İzleme Ekranı -->
         <div class="game-screen" id="gameScreen">
-            <div class="status-bar">
-                <div class="live-dot"></div>
+            <div class="status-bar wait" id="statusBar">
+                <div class="live-dot waiting" id="liveDot"></div>
                 <span id="statusText">Bağlanıyor...</span>
             </div>
 
-            <div class="score-grid" id="scoreGrid"></div>
-
-            <div class="sheet-area">
-                <button class="btn-show-sheet" onclick="toggleSheet()">📊 PUAN TABLOSUNU GÖSTER</button>
-                <div class="sheet-container" id="universalSheet"></div>
+            <div class="score-grid" id="scoreGrid">
+                <!-- Kartlar JS ile dolar -->
             </div>
+
+            <div class="last-update" id="lastUpdate"></div>
+
+            <button class="disconnect-btn" onclick="disconnect()">🔌 Bağlantıyı Kes / Farklı Masa</button>
         </div>
 
-        <div class="footer-version" id="footerVersion">v2.0.0</div>
+        <div class="footer-version" id="footerVersion">v2.1.0</div>
     </div>
 
+    <script src="firebase-config.js"></script>
     <script src="common.js"></script>
     <script>
-        const APP_VERSION = '2.0.0';
+        const APP_VERSION = '2.1.0';
         setFooterVersion(APP_VERSION);
 
-        let pollingInterval = null;
-        let currentMasaID  = null;
-        let lastDataHash   = '';
+        let unsubscribe   = null;  // Firestore listener iptal fonksiyonu
+        let currentMasaID = null;
+        let lastScores    = [];
 
+        /* ── URL'den masa parametresini oku ────────── */
         window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('masa')) {
-                document.getElementById('masaInput').value = urlParams.get('masa');
+            const params = new URLSearchParams(window.location.search);
+            const masa   = params.get('masa');
+            if (masa) {
+                document.getElementById('masaInput').value = masa;
                 connectToMasa();
             }
         };
 
+        /* ── BAĞLAN ─────────────────────────────────── */
         function connectToMasa() {
             const kod = document.getElementById('masaInput').value.trim();
-            if (kod.length < 4) { alert("En az 4 haneli kod giriniz."); return; }
+            if (kod.length < 4) { alert('En az 4 haneli kod giriniz.'); return; }
+
             currentMasaID = kod;
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('firebaseNotice').style.display = 'none';
+            document.getElementById('loginScreen').style.display  = 'none';
             document.getElementById('gameScreen').classList.add('active');
-            fetchData();
-            if (pollingInterval) clearInterval(pollingInterval);
-            // Şimdilik 3 saniyede bir localStorage'ı kontrol et
-            // Aşama 2'de bu Firestore onSnapshot ile değişecek
-            pollingInterval = setInterval(fetchData, 3000);
-        }
+            setStatus('wait', 'Bağlanıyor...');
 
-        function forceRefresh() {
-            document.getElementById('statusText').innerText = "Yenileniyor...";
-            fetchData();
-        }
-
-        function fetchData() {
-            // AŞAMA 1: localStorage'dan oku (aynı cihaz, offline)
-            const data = readGameState(currentMasaID);
-
-            if (!data) {
-                document.getElementById('statusText').innerText = "Masa bulunamadı / Henüz yayın yok";
-                return;
+            if (window.db) {
+                // ── Firestore gerçek zamanlı listener ─
+                unsubscribe = window.db.collection('masalar').doc(kod)
+                    .onSnapshot(
+                        doc => {
+                            if (doc.exists) {
+                                updateDisplay(doc.data());
+                                setStatus('ok', 'CANLI');
+                            } else {
+                                setStatus('err', 'Masa bulunamadı — kod doğru mu?');
+                            }
+                        },
+                        err => {
+                            console.error('[Firestore onSnapshot]', err);
+                            setStatus('err', 'Bağlantı hatası: ' + err.message);
+                        }
+                    );
+            } else {
+                // ── localStorage yedek (aynı cihaz) ──
+                setStatus('wait', 'Offline mod — aynı cihaz');
+                fetchLocalStorage();
+                setInterval(fetchLocalStorage, 3000);
             }
-
-            // Veri değişmediyse güncelleme yapma
-            const dataStr = JSON.stringify(data);
-            if (dataStr === lastDataHash) return;
-            lastDataHash = dataStr;
-
-            updateDisplay(data);
-
-            // AŞAMA 2: Firestore onSnapshot ile değişecek:
-            // db.collection('masalar').doc(currentMasaID).onSnapshot(doc => {
-            //     if (doc.exists) updateDisplay(doc.data());
-            //     else document.getElementById('statusText').innerText = "Masa kapalı";
-            // });
         }
 
+        function fetchLocalStorage() {
+            const data = readGameState(currentMasaID);
+            if (data) updateDisplay(data);
+            else setStatus('err', 'Masa bulunamadı (localStorage)');
+        }
+
+        /* ── BAĞLANTIYI KES ─────────────────────────── */
+        function disconnect() {
+            if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+            currentMasaID = null;
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('scoreGrid').innerHTML = '';
+            document.getElementById('gameTitle').textContent = 'Canlı İzle';
+            document.getElementById('mainHeader').style.background = '';
+            setStatus('wait', 'Bağlanıyor...');
+        }
+
+        /* ── MANUEL YENİLE ──────────────────────────── */
+        function forceRefresh() {
+            if (!currentMasaID || !window.db) return;
+            // onSnapshot zaten canlı — sadece görsel feedback
+            const btn = document.getElementById('btnRefresh');
+            btn.textContent = '✅';
+            setTimeout(() => btn.textContent = '🔄', 1000);
+        }
+
+        /* ── EKRAN GÜNCELLE ─────────────────────────── */
         function updateDisplay(data) {
             const header = document.getElementById('mainHeader');
             const title  = document.getElementById('gameTitle');
 
-            document.getElementById('statusText').innerText = `CANLI • Son: ${new Date().toLocaleTimeString()}`;
-
-            // Header rengi + başlık
-            const gameStyles = {
-                '101':   { bg: '#ee5253', name: '101 Okey' },
-                'batak': { bg: '#2c3e50', name: 'Batak' },
-                'king':  { bg: '#f39c12', name: 'King' },
-                'okey':  { bg: '#667eea', name: 'Düz Okey' },
+            // Oyun tipi → renk & başlık
+            const styles = {
+                '101':   { bg: 'linear-gradient(135deg,#ff6b6b,#ee5253)', name: '101 Okey' },
+                'batak': { bg: 'linear-gradient(135deg,#34495e,#2c3e50)', name: 'Batak' },
+                'king':  { bg: 'linear-gradient(135deg,#f1c40f,#f39c12)', name: 'King' },
+                'okey':  { bg: 'linear-gradient(135deg,#667eea,#764ba2)', name: 'Okey' },
             };
-            const style = gameStyles[data.gameType] || { bg: '#e67e22', name: 'Oyun' };
-            header.style.background = style.bg;
-            title.textContent        = `${style.name} (${currentMasaID})`;
+            const s    = styles[data.gameType] || { bg: 'linear-gradient(135deg,#e67e22,#d35400)', name: 'Oyun' };
+            const accentColor = getAccentColor(data.gameType);
+
+            header.style.background = s.bg;
+            title.textContent = `${s.name} • ${currentMasaID}`;
 
             // Skor kartları
-            const grid = document.getElementById('scoreGrid');
+            const grid  = document.getElementById('scoreGrid');
+            const names  = data.names  || [];
+            const scores = data.scores || [];
+
+            // Animasyon için eski skorları karşılaştır
             grid.innerHTML = '';
+            names.forEach((name, i) => {
+                const score = scores[i] ?? 0;
+                const wasHigher = lastScores[i] !== undefined && lastScores[i] !== score;
+                grid.innerHTML += `
+                    <div class="s-card ${wasHigher ? 'highlight' : ''}" style="border-top-color:${accentColor}">
+                        <div class="s-name">${escHtml(name)}</div>
+                        <div class="s-point ${score < 0 ? 'negative' : ''}">${score}</div>
+                    </div>`;
+            });
+            lastScores = [...scores];
 
-            if (data.teamMode && data.scores.length === 2) {
-                grid.innerHTML += createCard('BİZ', data.scores[0], style.bg);
-                grid.innerHTML += createCard('RAKİP', data.scores[1], style.bg);
-            } else if (data.names) {
-                data.names.forEach((name, i) => {
-                    grid.innerHTML += createCard(name, data.scores[i], style.bg);
-                });
+            // Son güncelleme zamanı
+            if (data.updatedAt) {
+                const d = new Date(data.updatedAt);
+                document.getElementById('lastUpdate').textContent =
+                    `Son güncelleme: ${d.toLocaleTimeString('tr-TR')}`;
             }
 
-            // Puan tablosu (sheetHTML direkt yerleştiriliyor)
-            if (data.sheetHTML) {
-                const sheet = document.getElementById('universalSheet');
-                sheet.innerHTML = data.sheetHTML;
-                // Tablo header rengini eşleştir
-                sheet.querySelectorAll('.score-table th').forEach(th => th.style.background = style.bg);
-            }
+            // Highlight kaldır
+            setTimeout(() => {
+                document.querySelectorAll('.s-card.highlight').forEach(c => c.classList.remove('highlight'));
+            }, 800);
         }
 
-        function createCard(name, score, color) {
-            return `<div class="s-card" style="border-top-color:${color}">
-                <div class="s-name">${name}</div>
-                <div class="s-point">${score}</div>
-            </div>`;
+        /* ── YARDIMCILAR ────────────────────────────── */
+        function setStatus(type, text) {
+            const bar = document.getElementById('statusBar');
+            const dot = document.getElementById('liveDot');
+            bar.className = 'status-bar ' + type;
+            dot.className = 'live-dot' + (type === 'ok' ? '' : type === 'err' ? ' error' : ' waiting');
+            document.getElementById('statusText').textContent = text;
         }
 
-        function toggleSheet() {
-            const sheet = document.getElementById('universalSheet');
-            const btn   = document.querySelector('.btn-show-sheet');
-            sheet.classList.toggle('open');
-            btn.textContent = sheet.classList.contains('open') ? '📊 GİZLE' : '📊 PUAN TABLOSUNU GÖSTER';
+        function getAccentColor(gameType) {
+            return { '101': '#ee5253', 'batak': '#2c3e50', 'king': '#f39c12', 'okey': '#667eea' }[gameType] || '#e67e22';
+        }
+
+        function escHtml(str) {
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         }
     </script>
 </body>

@@ -1,6 +1,7 @@
 /**
- * YazBoz — common.js
- * Tüm oyun sayfaları tarafından paylaşılan JS fonksiyonları
+ * YazBoz — common.js v2.1.0
+ * Tüm oyun sayfaları tarafından paylaşılan JS fonksiyonları.
+ * Firebase compat SDK yüklendikten SONRA bu dosya yüklenmeli.
  */
 
 'use strict';
@@ -32,7 +33,6 @@ function playClick() {
     osc.stop(audioCtx.currentTime + 0.05);
 }
 
-/* Global tıklama sesi — buton ve player-card'lara otomatik */
 document.addEventListener('click', e => {
     if (e.target.closest('button') || e.target.closest('.player-card')) {
         playClick();
@@ -62,67 +62,98 @@ function setFooterVersion(v) {
 
 /* ═══════════════════════════════════════════════
    MASA KOD ÜRETİCİ
-   Şu an: Rastgele 4 haneli kod (localStorage kontrolsüz)
-   Aşama 2'de: Firestore'a sorarak çakışma kontrolü
    ═══════════════════════════════════════════════ */
 function getSafeMasaID() {
-    // Aşama 2'de bu fonksiyon async hale gelecek ve Firestore'a soracak
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 /* ═══════════════════════════════════════════════
-   PAYLAŞIM (MASA YAYINI)
-   Şu an: localStorage'a kaydeder (izle.html aynı cihazda çalışır)
-   Aşama 2'de: Firestore'a yazar → tüm cihazlar görebilir
+   PAYLAŞIM — FIRESTORE (birincil) + localStorage (yedek)
    ═══════════════════════════════════════════════ */
+
+/**
+ * Oyun durumunu Firestore'a ve localStorage'a yazar.
+ * @param {string} masaID  - 4 haneli masa kodu
+ * @param {object} state   - { gameType, names, scores, teamMode? }
+ */
 function publishGameState(masaID, state) {
-    /**
-     * state = {
-     *   gameType : "batak" | "101" | "king" | "okey",
-     *   teamMode : true | false,
-     *   names    : ["Ali", "Veli", "Ayşe", "Fatma"],
-     *   scores   : [120, -30, 80, 0],
-     *   sheetHTML: "<table>...</table>"
-     * }
-     */
     const payload = {
         ...state,
         updatedAt: Date.now()
     };
 
-    // Şu an: localStorage (tek cihaz, offline)
-    localStorage.setItem('masa_' + masaID, JSON.stringify(payload));
+    // 1. Firestore (gerçek zamanlı, çoklu cihaz)
+    if (window.db) {
+        window.db.collection('masalar').doc(masaID).set(payload)
+            .then(() => console.log('[Firestore] Yayınlandı:', masaID))
+            .catch(err => console.error('[Firestore] Hata:', err));
+    }
 
-    // Aşama 2: Firebase (çoklu cihaz, gerçek zamanlı)
-    // await db.collection('masalar').doc(masaID).set(payload);
+    // 2. localStorage (aynı cihaz yedek)
+    try {
+        localStorage.setItem('masa_' + masaID, JSON.stringify(payload));
+    } catch(e) {}
 }
 
+/**
+ * Oyun durumunu localStorage'dan okur (aynı cihaz yedek).
+ * Firestore okuma izle.html'de onSnapshot ile yapılır.
+ */
 function readGameState(masaID) {
-    // Şu an: localStorage'dan oku
     const raw = localStorage.getItem('masa_' + masaID);
     if (!raw) return null;
-    try {
-        return JSON.parse(raw);
-    } catch(e) {
-        return null;
+    try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+/* ═══════════════════════════════════════════════
+   PAYLAŞIM MODAL — Tüm oyunlarda ortak
+   ═══════════════════════════════════════════════ */
+
+/**
+ * Masa kodunu ve link'i gösteren paylaşım modalını açar.
+ * Her oyun sayfasında aynı HTML: id="shareModal"
+ */
+function openShareModal(masaID) {
+    const base   = window.location.href.replace(/\/[^/]*$/, '/');
+    const url    = base + 'izle.html?masa=' + masaID;
+
+    const codeEl = document.getElementById('shareMasaCode');
+    const linkEl = document.getElementById('shareLink');
+    if (codeEl) codeEl.textContent = masaID;
+    if (linkEl) { linkEl.href = url; linkEl.textContent = url; }
+
+    openModal('shareModal');
+}
+
+function copyShareLink() {
+    const linkEl = document.getElementById('shareLink');
+    if (!linkEl) return;
+    const url = linkEl.href;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = document.getElementById('btnCopyLink');
+            if (btn) {
+                btn.textContent = '✅ Kopyalandı!';
+                setTimeout(() => btn.textContent = '🔗 Linki Kopyala', 2000);
+            }
+        });
     }
-    // Aşama 2: Firestore onSnapshot ile dinle (izle.html tarafında)
 }
 
 /* ═══════════════════════════════════════════════
    AKILLI SIRALAMA (Ana Menü)
    ═══════════════════════════════════════════════ */
 function saveUsage(gameId) {
-    const usageData = JSON.parse(localStorage.getItem('gameUsage')) || {};
+    const usageData = JSON.parse(localStorage.getItem('gameUsage') || '{}');
     usageData[gameId] = Date.now();
     localStorage.setItem('gameUsage', JSON.stringify(usageData));
 }
 
 function sortMenuByUsage(gridId) {
-    const grid  = document.getElementById(gridId);
+    const grid = document.getElementById(gridId);
     if (!grid) return;
     const cards = Array.from(grid.children);
-    const usage = JSON.parse(localStorage.getItem('gameUsage')) || {};
+    const usage = JSON.parse(localStorage.getItem('gameUsage') || '{}');
     cards.sort((a, b) => {
         const tA = usage[a.getAttribute('data-id')] || 0;
         const tB = usage[b.getAttribute('data-id')] || 0;
@@ -130,14 +161,3 @@ function sortMenuByUsage(gridId) {
     });
     cards.forEach(c => grid.appendChild(c));
 }
-
-/* ═══════════════════════════════════════════════
-   FIREBASE INIT PLACEHOLDER
-   Aşama 2'de firebase-config.js ile birlikte etkinleşecek
-   ═══════════════════════════════════════════════ */
-// import { initializeApp } from 'firebase/app';
-// import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
-// import firebaseConfig from './firebase-config.js';
-//
-// const app = initializeApp(firebaseConfig);
-// const db  = getFirestore(app);

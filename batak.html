@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Batak Skor</title>
     <link rel="stylesheet" href="common.css">
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         /* ── BATAK RENK TOKENları ─────────────────── */
         :root {
@@ -78,6 +81,7 @@
             <button class="btn-icon" onclick="goHome()">🏠</button>
             <h1>BATAK</h1>
             <div class="header-right">
+                <button class="btn-icon" id="btnShare" onclick="shareMasa()" title="Masayı Paylaş">📡</button>
                 <button class="btn-icon" onclick="openSheetModal()" title="Puan Tablosu">📊</button>
                 <button class="btn-icon" onclick="resetGame()" title="Sıfırla">🔄</button>
             </div>
@@ -182,6 +186,26 @@
         </div>
     </div>
 
+    <!-- Paylaşım Modalı -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center;">
+            <div class="modal-title">📡 Masayı Paylaş</div>
+            <div style="margin:20px 0;">
+                <div style="font-size:11px; color:#999; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Masa Kodu</div>
+                <div id="shareMasaCode" style="font-size:52px; font-weight:900; letter-spacing:12px; color:var(--accent,#2c3e50);">----</div>
+            </div>
+            <div style="font-size:12px; color:#666; margin:10px 20px 20px; line-height:1.6;">
+                Bu kodu izleyicilere gösterin.<br>
+                <a id="shareLink" href="#" target="_blank" style="color:#3498db; word-break:break-all; font-size:11px;"></a>
+            </div>
+            <button class="btn-modal-action btn-green" id="btnCopyLink" onclick="copyShareLink()">🔗 Linki Kopyala</button>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn-modal-action btn-gray" onclick="closeModal('shareModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
     <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.1.0';
@@ -195,7 +219,8 @@
             players: [],
             scores: [],
             history: [],
-            gameActive: false
+            gameActive: false,
+            masaID: null
         };
 
         let inputState = { values: [0,0,0,0] };
@@ -241,6 +266,22 @@
                 p[2].value = "Karşı"; p[2].disabled = false;
                 p[3].value = "Sol";   p[3].disabled = false;
             }
+        }
+
+        function publishMasa() {
+            if (!gameState.masaID || !gameState.gameActive) return;
+            publishGameState(gameState.masaID, {
+                gameType: 'batak',
+                names   : gameState.players,
+                scores  : gameState.scores
+            });
+        }
+
+        function shareMasa() {
+            if (!gameState.gameActive) { alert('Önce oyun başlatın.'); return; }
+            if (!gameState.masaID) { gameState.masaID = getSafeMasaID(); saveState(); }
+            openShareModal(gameState.masaID);
+            publishMasa();
         }
 
         function startGame() {
@@ -349,7 +390,7 @@
                 bid:    gameState.gameType === 'kozmaca' ? 0 : bid,
                 tricks: [...tricks], points
             });
-            closeModal('inputModal'); updateUI(); saveState();
+            closeModal('inputModal'); updateUI(); saveState(); publishMasa();
         }
 
         function openEditModal(index) {
@@ -390,7 +431,7 @@
             for (let i=0; i<4; i++) gameState.scores[i] += points[i];
             gameState.history[idx].tricks = tricks;
             gameState.history[idx].points = points;
-            closeModal('editModal'); updateUI(); saveState();
+            closeModal('editModal'); updateUI(); saveState(); publishMasa();
         }
 
         function deleteRound(index) {

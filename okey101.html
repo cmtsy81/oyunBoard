@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>101 Okey Skor</title>
     <link rel="stylesheet" href="common.css">
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         /* ── 101 OKEY RENK TOKENları ──────────────── */
         :root { --accent: #ee5253; }
@@ -43,6 +46,7 @@
             <button class="btn-icon" onclick="goHome()">🏠</button>
             <h1>101 Okey</h1>
             <div class="header-right">
+                <button class="btn-icon" id="btnShare" onclick="shareMasa()" title="Masayı Paylaş">📡</button>
                 <button class="btn-icon" onclick="openSheetModal()" title="Puan Tablosu">📊</button>
                 <button class="btn-icon" onclick="resetGame()" title="Sıfırla">🔄</button>
             </div>
@@ -133,6 +137,26 @@
         </div>
     </div>
 
+    <!-- Paylaşım Modalı -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center;">
+            <div class="modal-title">📡 Masayı Paylaş</div>
+            <div style="margin:20px 0;">
+                <div style="font-size:11px; color:#999; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Masa Kodu</div>
+                <div id="shareMasaCode" style="font-size:52px; font-weight:900; letter-spacing:12px; color:var(--accent,#ee5253);">----</div>
+            </div>
+            <div style="font-size:12px; color:#666; margin:10px 20px 20px; line-height:1.6;">
+                Bu kodu izleyicilere gösterin.<br>
+                <a id="shareLink" href="#" target="_blank" style="color:#3498db; word-break:break-all; font-size:11px;"></a>
+            </div>
+            <button class="btn-modal-action btn-green" id="btnCopyLink" onclick="copyShareLink()">🔗 Linki Kopyala</button>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn-modal-action btn-gray" onclick="closeModal('shareModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
     <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.4.3';
@@ -146,13 +170,30 @@
             scores: [],
             playerNames: [],
             gameActive: false,
-            history: []
+            history: [],
+            masaID: null
         };
 
         let roundState = { winnerIndex: null, finishType: 'normal' };
         let editState  = { index: null, winnerIndex: null, finishType: 'normal' };
 
         window.onload = loadState;
+
+        function publishMasa() {
+            if (!gameState.masaID || !gameState.gameActive) return;
+            publishGameState(gameState.masaID, {
+                gameType: '101',
+                names   : gameState.playerNames,
+                scores  : gameState.scores
+            });
+        }
+
+        function shareMasa() {
+            if (!gameState.gameActive) { alert('Önce oyun başlatın.'); return; }
+            if (!gameState.masaID) { gameState.masaID = getSafeMasaID(); saveState(); }
+            openShareModal(gameState.masaID);
+            publishMasa();
+        }
 
         function startGame() {
             gameState.startNumber = 0;
@@ -227,7 +268,7 @@
             const changes = processRound(roundState.winnerIndex, roundState.finishType, 'modalInputs');
             for (let i=0; i<4; i++) gameState.scores[i] += changes[i];
             gameState.history.push({ winner: roundState.winnerIndex, type: roundState.finishType, changes });
-            closeModal('inputModal'); updateUI(); saveState();
+            closeModal('inputModal'); updateUI(); saveState(); publishMasa();
         }
 
         function processRound(winnerIdx, type, inputContainerId) {
@@ -265,7 +306,7 @@
             const newChanges = processRound(editState.winnerIndex, editState.finishType, 'editModalInputs');
             for (let i=0; i<4; i++) gameState.scores[i] += newChanges[i];
             gameState.history[idx] = { winner: editState.winnerIndex, type: editState.finishType, changes: newChanges };
-            closeModal('editModal'); updateUI(); saveState();
+            closeModal('editModal'); updateUI(); saveState(); publishMasa();
         }
 
         function deleteRound(index) {

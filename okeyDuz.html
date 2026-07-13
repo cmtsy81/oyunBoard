@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Okey Skor</title>
     <link rel="stylesheet" href="common.css">
+    <!-- Firebase Compat SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         /* ── DÜZ OKEY RENK TOKENları ──────────────── */
         :root { --accent: #667eea; --accent2: #764ba2; }
@@ -57,6 +60,7 @@
             <button class="btn-icon" onclick="goHome()">🏠</button>
             <h1>Okey</h1>
             <div class="header-right">
+                <button class="btn-icon" id="btnShare" onclick="shareMasa()" title="Masayı Paylaş">📡</button>
                 <button class="btn-icon" onclick="openSheetModal()" title="Puan Tablosu">📊</button>
                 <button class="btn-icon" onclick="resetGameAttempt()" title="Sıfırla">🔄</button>
             </div>
@@ -167,6 +171,26 @@
         </div>
     </div>
 
+    <!-- Paylaşım Modalı -->
+    <div class="modal" id="shareModal">
+        <div class="modal-content" style="text-align:center;">
+            <div class="modal-title">📡 Masayı Paylaş</div>
+            <div style="margin:20px 0;">
+                <div style="font-size:11px; color:#999; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">Masa Kodu</div>
+                <div id="shareMasaCode" style="font-size:52px; font-weight:900; letter-spacing:12px; color:var(--accent,#667eea);">----</div>
+            </div>
+            <div style="font-size:12px; color:#666; margin:10px 20px 20px; line-height:1.6;">
+                Bu kodu izleyicilere gösterin.<br>
+                <a id="shareLink" href="#" target="_blank" style="color:#3498db; word-break:break-all; font-size:11px;"></a>
+            </div>
+            <button class="btn-modal-action btn-green" id="btnCopyLink" onclick="copyShareLink()">🔗 Linki Kopyala</button>
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn-modal-action btn-gray" onclick="closeModal('shareModal')">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
     <script src="common.js"></script>
     <script>
         const APP_VERSION = '1.4.0';
@@ -176,12 +200,30 @@
 
         let gameState = {
             version: APP_VERSION, teamMode: false, startNumber: 20,
-            scores: [], playerNames: [], gameActive: false, history: []
+            scores: [], playerNames: [], gameActive: false, history: [],
+            masaID: null
         };
 
         let tempWinnerIndex = null;
         let editState       = { index: null, finish: 'normal' };
         let setupState      = { teamMode: false, startNumber: 20 };
+
+        function publishMasa() {
+            if (!gameState.masaID || !gameState.gameActive) return;
+            publishGameState(gameState.masaID, {
+                gameType: 'okey',
+                teamMode: gameState.teamMode,
+                names   : gameState.playerNames,
+                scores  : gameState.scores
+            });
+        }
+
+        function shareMasa() {
+            if (!gameState.gameActive) { alert('Önce oyun başlatın.'); return; }
+            if (!gameState.masaID) { gameState.masaID = getSafeMasaID(); saveState(); }
+            openShareModal(gameState.masaID);
+            publishMasa();
+        }
 
         window.onload = loadState;
 
@@ -245,7 +287,7 @@
             }
 
             gameState.history.push({ winnerMask: tempWinnerIndex, finish: type, points });
-            checkForEnd(); updateUI(); saveState();
+            checkForEnd(); updateUI(); saveState(); publishMasa();
         }
 
         function checkForEnd() {
@@ -297,7 +339,7 @@
                 for (let i=0; i<4; i++) if (i !== newWinnerVal) gameState.scores[i] -= newPoints;
             }
             gameState.history[hIdx] = { winnerMask: newWinnerVal, finish: editState.finish, points: newPoints };
-            closeEditModal(); updateUI(); saveState();
+            closeEditModal(); updateUI(); saveState(); publishMasa();
         }
 
         function closeEditModal() { closeModal('editModal'); }
